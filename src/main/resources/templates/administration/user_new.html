@@ -1,0 +1,183 @@
+<div class="row" id="msg"></div>
+<div>
+    <form th:object="${user}" id="f_user">
+        <table class="table border-0">
+            <tr>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{admin.user.login.name} + ':'"></label><i class='fa fa-asterisk'
+                                                                                 style='color: red;font-size: 0.5rem; '></i>
+                        <button id="dept" class="btn btn-primary btn-sm" th:text="#{it_asset.dept}"></button>
+                        <input type="text" class="form-control w-100" th:field="*{userName}" id="f_userName">
+                    </div>
+                </td>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{admin.user.username} + ':'"></label>
+                        <i class='fa fa-asterisk'
+                           style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control w-100" th:field="*{orgName}" id="f_orgName">
+                    </div>
+                </td>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{it_asset.ssn} + ':'"></label><i class='fa fa-asterisk'
+                                                                                 style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control w-100" th:field="*{ssn}" id="f_ssn">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{it_asset.dept} + ':'"></label><i class='fa fa-asterisk'
+                                                                                 style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control w-100" th:field="*{dept}" id="f_dept">
+                    </div>
+                </td>
+
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{admin.user.password} + ':'"></label><i class='fa fa-asterisk'
+                                                                                 style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control w-100" th:field="*{password}" id="f_password">
+                    </div>
+                </td>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{admin.user.email} + ':'"></label><i class='fa fa-asterisk'
+                                                                              style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control w-100" th:field="*{email}" id="f_email">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{admin.user.enable} + ':'"></label>
+                        <input type="text" hidden class="form-control" th:field="*{enable}" id="f_enable">
+                        <select class="form-control" id="s_enable">
+                            <option value="1" th:text="#{it_asset.yes}" autofocus></option>
+                            <option value="0" th:text="#{it_asset.no}"></option>
+                        </select>
+                    </div>
+                </td>
+                <td class="text-center" style="vertical-align: middle" colspan="2">
+                    <button class="btn btn-primary" id="btn_submit" th:text="#{it_asset.submit}"></button>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+</div>
+<script th:inline="javascript">
+
+    $(document).ready(function () {
+
+        $("#f_enable").val($("#s_enable").val());
+
+        $("#btn_submit").on("click", function (e) {
+            e.preventDefault();
+
+            let valid = verification();
+            if (valid) {
+                let valid_unique = verification_unique();
+                if (valid_unique){
+                    ajax_user_new();
+                }
+            }
+        });
+
+        $("#s_enable").on("change",function (e){
+
+            $("#f_enable").val(this.value);
+        })
+
+        $("#dept").on("click",function (e){
+            e.preventDefault();
+            ajax_openDeptEmp();
+        })
+
+    })
+
+    function verification() {
+        var valid = true;
+        const userName = $.trim($("#f_userName").val());
+        const password = $.trim($("#f_password").val());
+        const email = $.trim($("#f_email").val());
+        const enable = $.trim($("#f_enable").val());
+
+        if (userName === "") {
+            valid = false;
+            show_mes("User name cannot be empty",true);
+            return valid;
+        }
+        if (password === "") {
+            valid = false;
+            show_mes("Password cannot be empty",true);
+            return valid;
+        }
+        if (email === "") {
+            valid = false;
+            show_mes("Email cannot be empty",true);
+            return valid;
+        }
+        if (enable === "") {
+            valid = false;
+            show_mes("Enable cannot be empty",true);
+            return valid;
+        }
+
+        let u_username = ajax_is_username_unique(userName);
+        if (u_username === true) {
+            valid = false;
+            show_mes("User name is existing, please input an unique user name.",true);
+            return valid;
+        }
+
+        let u_email = ajax_is_email_unique(email);
+        if (u_email === true) {
+            valid = false;
+            show_mes("Email is existing, please input an unique email.",true);
+            return valid;
+        }
+
+        return valid;
+    }
+
+
+    function ajax_user_new() {
+        const json_formData = $('#f_user').serializeArray()
+            .reduce(function (a, x) {
+                a[x.name] = x.value;
+                return a;
+            }, {});
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/api/admin/user/",
+            data: JSON.stringify(json_formData),
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+
+                $el = $("#msg");
+                $el.empty();
+                $el.html("<div class='alert alert-success'>" +
+                    "<strong>Updated successfully</strong>" +
+                    '</div>');
+                $("#detail_modal").modal('hide');
+
+            },
+            error: function (data) {
+                alert(JSON.stringify(data));
+                $el = $("#msg");
+                $el.empty();
+                $el.html("<div class='alert alert-danger'>" +
+                    "<strong>Updated failed</strong>" + "</div>");
+            }
+        })
+    }
+</script>

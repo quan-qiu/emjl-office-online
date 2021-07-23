@@ -1,0 +1,134 @@
+<div th:switch="${prms!=null and !prms.empty}">
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col" th:text="#{pr.title}"></th>
+                <th scope="col" th:text="#{pr.no}"></th>
+                <th scope="col" th:text="#{pr.flow_type_s}"></th>
+                <th scope="col" th:text="#{pr.cost_center}"></th>
+                <th scope="col" th:text="#{pr.apl.dept}"></th>
+                <th scope="col" th:text="#{pr.project.name}"></th>
+                <th scope="col" th:text="#{pr.status}"></th>
+                <th scope="col" th:text="#{pr.process}"></th>
+                <th scope="col" th:text="#{pr.pass}"></th>
+                <th scope="col" th:text="#{pr.prm.total.estcost}"></th>
+                <th scope="col" th:text="#{created.date}"></th>
+            </tr>
+            </thead>
+            <tr th:each="prm,iter:${prms}">
+                <td>
+                    <span th:text="${iter.index +1 }"></span>
+                </td>
+                <td>
+                    <a class="a_read">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                        <samll th:text="${prm.prTitle}"></samll>
+                    </a>
+                    <span class='prm_id' hidden th:text="${prm.id}"></span>
+                </td>
+                <td>
+                    <samll th:text="${prm.prNo}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prm.flowType}"></samll>
+
+                </td>
+                <td>
+                    <samll th:text="${prm.costCenter}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prm.aplDept}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prm.projectName}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prm.submitted==1} ? #{pr.submitted}:#{pr.saved}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prm.finished==1} ? #{pr.status.completed}:#{pr.status.pending}"></samll>
+                    <span th:if="${prm.finished==1}">
+                        <b><i class="fa fa-flag fa-lg" style='color: green '></i></b>
+                    </span>
+                    <span th:if="${prm.finished==0 }">
+                        <b><i class="fa fa-flag fa-lg" style='color: blue '></i></b>
+                        <!--<button class="btn btn-danger revoke" th:text="#{pr.prm.revoke}"></button>-->
+                    </span>
+                </td>
+                <td>
+                    <div th:switch="${prm.finished}">
+                        <div th:case="1">
+                            <samll th:text="${prm.approved==1}? #{pr.approve.agreed}:#{pr.approve.rejected}"></samll>
+                            <span th:if="${prm.approved==1}">
+                            <b><i class="fa fa-check fa-lg" style='color: green '></i></b>
+                            </span>
+                                    <span th:if="${prm.approved==0}">
+                                <b><i class="fa fa-times fa-lg" style='color: red '></i></b>
+                            </span>
+                        </div>
+                        <div th:case="0">
+                            <button class="btn btn-info btn-sm" th:text="#{pr.task.assignee}"></button>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <small th:text="${prm.totalEstCost}"></small>
+                </td>
+                <td>
+                    <samll th:text="${#dates.format(prm.prAplDate,'yyyy-MM-dd')}"></samll>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="row" th:case="false">
+        <h5 th:text="#{no.record}"></h5>
+    </div>
+</div>
+
+<div class="modal fade" id="v_pr_detail_modal" >
+    <div class="modal-dialog " style="max-width: 80%!important;" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-block">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body mx-2" id="v_pr_item_details">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" data-dismiss="modal" th:text="#{page.close}"></button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="test"></div>
+
+
+
+<script th:inline="javascript">
+    $(document).ready(function () {
+        $('a.a_read').click(function (e) {
+            const id = $(this).closest("td").find(".prm_id").text();
+            ajax_readPRMById(id);
+        });
+
+    });
+
+    function  ajax_readPRMById(id){
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url: "/pr/prm/history/" + id,
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data) {
+                $("#v_pr_item_details").empty();
+                $("#v_pr_item_details").html(data);
+                $("#v_pr_detail_modal").modal();
+            }
+        })
+    }
+
+
+</script>

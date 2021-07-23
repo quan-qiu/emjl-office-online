@@ -1,0 +1,292 @@
+<!--<script th:inline="javascript" th:src="@{util.js}"></script>-->
+<div class="row d-flex justify-content-center">
+    <div id="msg"></div>
+
+    <form th:object="${asset}" id="f_asset">
+        <table>
+            <tr>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{it_asset.username} + ':'"></label><i class='fa fa-asterisk fa-xs' style='color: red;font-size: 0.5rem; '></i>
+                        <button id="dept" class="btn btn-primary btn-sm" th:text="#{it_asset.dept}"></button>
+                        <input type="text" class="form-control w-100" th:field="*{userName}" id="f_user_name">
+                    </div>
+                </td>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{it_asset.ssn} + ':'">:</label>
+                        <input type="text" class="form-control" th:field="*{ssn}" id="f_ssn">
+                    </div>
+                </td>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{it_asset.dept} + ':'"></label><i class='fa fa-asterisk' style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control w-100" th:field="*{dept}" id="f_dept">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{it_asset.asset_type} + ':'"></label><i class='fa fa-asterisk' style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control w-100" th:field="*{assetType}" id="f_asset_type">
+                    </div>
+                </td>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{it_asset.asset_id} + ':'">:</label>
+                        <input type="text" class="form-control" th:field="*{assetId}" id="f_asset_id">
+                    </div>
+                </td>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{it_asset.it_type} + ':'"></label><i class='fa fa-asterisk' style='color: red;font-size: 0.5rem; '></i>
+                        <input hidden type="text" class="form-control" th:field="*{type}" id="f_it_type" placeholder="IT type">
+                        <select class="form-control" id="s_it_type"></select>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{it_asset.brand_model} + ':'"></label><i class='fa fa-asterisk' style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control" th:field="*{brandModel}" id="f_brand_model">
+                    </div>
+                </td>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{it_asset.sn} + ':'"></label>
+                        <input type="text" class="form-control" th:field="*{sn}" id="f_sn">
+                    </div>
+                </td>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{it_asset.location} + ':'"></label><i class='fa fa-asterisk' style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control" th:field="*{location}" id="f_location">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{it_asset.purchase_date} + ':'"></label>
+                        <input type="text" class="form-control" th:field="*{purchaseDate}" id="f_purchase_date"
+                               readonly>
+                    </div>
+                </td>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{it_asset.status} + ':'"></label><i class='fa fa-asterisk' style='color: red;font-size: 0.5rem; '></i>
+                        <input hidden type="text" class="form-control" th:field="*{status}" id="f_it_status">
+                        <select class="form-control" id="s_it_status"></select>
+                    </div>
+                </td>
+                <td class="text-left" >
+                    <div class="form-group">
+                        <label th:text="#{it_asset.comment} + ':'"></label>
+                        <textarea class="form-control" th:field="*{comment}" id="f_comment" rows="3"></textarea>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-center" colspan="3">
+                    <button th:text="#{it_asset.submit}" id="s_submit" class="btn btn-danger" />
+                </td>
+            </tr>
+        </table>
+    </form>
+
+</div>
+
+
+
+<script th:inline="javascript">
+
+    $(document).ready(function () {
+        const date = new Date();
+        const today = new Date(date.getFullYear(), (date.getMonth()+1), date.getDate());
+
+        ajax_get_hardwareType();
+        ajax_get_hardwareStatus();
+
+        $("#f_purchase_date").val(date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate());
+
+        $("#f_purchase_date").datepicker({
+            format: "yyyy-mm-dd",
+            todayHighlight: true,
+            daysOfWeekHighlighted: "0,6",
+            setDate: today,
+            autoclose: true
+        });
+
+        $("#s_it_type").on("change",function (e){
+            $("#f_it_type").val($("#s_it_type").val());
+        });
+
+        $("#s_it_status").on("change",function (e){
+            $("#f_it_status").val($("#s_it_status").val());
+        });
+
+        $("#s_submit").on("click", function (e) {
+            e.preventDefault();
+            const valid = verification();
+
+            if (valid) {
+                ajax_asset_save();
+            } else {
+                $el= $("#msg");
+                $el.empty();
+                $el.html("<div class='alert alert-danger'>" +
+                    "<strong>Field marked with red stars must be filled a value</strong>"+
+                    '</div>');
+            }
+        });
+
+        $("#dept").on("click",function (e){
+            e.preventDefault();
+            ajax_openDeptEmp();
+        })
+    })
+
+    function verification() {
+        let valid = true;
+        const userName = $.trim($("#f_user_name").val());
+        const dept = $.trim($("#f_dept").val());
+        const asset_type = $.trim($("#f_asset_type").val());
+        const it_type = $.trim($("#f_it_type").val());
+        const brandModel = $.trim($("#f_brand_model").val());
+        const location = $.trim($("#f_location").val());
+        const status = $.trim($("#f_it_status").val());
+
+        if (userName === "") {
+            valid = false;
+            return valid;
+        }
+        if (dept === "") {
+            valid = false;
+            return valid;
+        }
+        if (asset_type === "") {
+            valid = false;
+            return valid;
+        }
+        if (it_type === "*") {
+            valid = false;
+            return valid;
+        }
+        if (brandModel === "") {
+            valid = false;
+            return valid;
+        }
+        if (location === "") {
+            valid = false;
+            return valid;
+        }
+        if (status === "*") {
+            valid = false;
+            return valid;
+        }
+        return valid;
+    }
+
+    function show_mes(message,err) {
+        let $el= $("#msg");
+        $el.empty();
+
+        if(err === false){
+            $el.html("<div class='alert alert-success'>" +
+                "<strong>"+message + "</strong>"+
+                '</div>');
+        }else{
+            $el.html("<div class='alert alert-danger'>" +
+                "<strong>"+message + "</strong>"+
+                '</div>');
+        }
+
+    };
+
+    function ajax_get_hardwareType() {
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/api/asset/getType",
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+
+                const $el = $('#s_it_type');
+                $el.empty();
+                $el.append($('<option></option>').attr('value', '*').text("Select a type"));
+                $.each(data, function (index) {
+                    $el.append($('<option></option>').attr('value', data[index]['type']).text(
+                        data[index]['type']
+                    ));
+                });
+            }
+        });
+    }
+
+    function ajax_get_hardwareStatus() {
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/api/asset/getStatus",
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+
+                const $el = $('#s_it_status');
+                $el.empty();
+                $el.append($('<option></option>').attr('value', '*').text("Select a status"));
+                $.each(data, function (index) {
+                    $el.append($('<option></option>').attr('value', data[index]['name']).text(
+                        data[index]['name']
+                    ));
+                });
+            }
+        });
+    }
+
+    function ajax_asset_save(){
+        const json_formData = $('#f_asset').serializeArray()
+            .reduce(function(a, x) { a[x.name] = x.value; return a; }, {});
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/api/asset/save",
+            data: JSON.stringify(json_formData),
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                // $("#add_modal").modal('hide');
+                let $el= $("#msg");
+                $el.empty();
+                $el.html("<div class='alert alert-success'>" +
+                    "<strong>Asset was added successfully</strong>"+
+                    '</div>');
+
+                $("#add_modal").modal('hide');
+               // $("#search").trigger("onclick");
+            },
+            error: function (jqXHR, exception) {
+                let $el= $("#msg");
+                $el.empty();
+                /*var responseTitle= $(jqXHR.responseText).filter('title').get(0);
+                const msg= getErrorMessage(jqXHR, exception);*/
+                $el.html("<div class='alert alert-danger'>" +
+                    "<strong>Updated failed</strong>"+ "</div>");
+            }
+        })
+    }
+
+
+
+</script>
+
+
+<!--
+</body>-->

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <title>EUROMISI IT Asset Home</title>
+
+    <div th:replace="fragments/fragments::html_header('tag')"></div>
+
+</head>
+<body>
+<div th:replace="it-asset/asset_frag::asset_header"></div>
+
+<div class="container">
+    <div class="row my-2 mx-lg-5">
+        <table class="table table-bordered">
+            <tr>
+                <th class="table-primary" scope="col" th:text="#{it-asset.index.name}"></th>
+                <th class="table-primary" scope="col" th:text="#{it-asset.index.classification}"></th>
+                <th class="table-primary" scope="col" th:text="#{it_asset.status}"></th>
+                <td class="text-sm-center" rowspan="2">
+                    <button class="btn btn-primary my-2" th:text="#{it-asset.index.search}" id="search"></button>
+                    <br>
+                    <div sec:authorize="hasAuthority('ADMIN')">
+                    <button type="button" class="btn btn-link" id="add" data-toggle="modal" data-target="#add_modal" >
+                        <i class="fa fa-plus-circle fa-3x" style='color: dodgerblue '></i>
+                    </button>
+                    </div>
+<!--                    <a th:href="@{/it-asset/new}" target="_blank">
+                        <i class="fa fa-plus-circle fa-3x" style='color: dodgerblue '></i>
+                    </a>-->
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input class="form-control" type="text" placeholder="Username" id="username">
+                </td>
+                <td>
+                    <select class="mdb-select md-form form-control" searchable="Search here.." id="type"></select>
+                </td>
+                <td>
+                    <select class="mdb-select md-form form-control" searchable="Search here.." id="status"></select>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="update_asset"></div>
+
+    <div class="modal fade" id="add_modal" tabindex="-1" role="dialog" th:fragment="assetContent">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header d-block">
+                    <h4 class="modal-title" th:text="#{it_asset.asset_content}"></h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body mx-auto" id="newAssetContent">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" th:text="#{it_asset.close}"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="delete_modal" >
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header d-block">
+                    <h4 class="modal-title " th:text="#{it_asset.delete}"></h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body" >
+                    <div th:text="#{it_asset.delete_msg}"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="d_submit" th:text="Yes"></button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" th:text="#{it_asset.close}"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="dept_modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header d-block">
+                    <h4 class="modal-title " th:text="#{it_asset.dept}"></h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body" id="dept_detail">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" th:text="#{it_asset.close}"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row my-2" id="assets"></div>
+    <footer th:replace="fragments/fragments::html_footer"></footer>
+</div>
+
+<div th:replace="fragments/fragments::html_js('tag')"></div>
+<script th:inline="javascript">
+
+    $(document).ready(function () {
+        ajax_get_hardwareType();
+        ajax_get_hardwareStatus();
+
+        $("#search").click(function () {
+            const username = ($("#username").val() == "" ? "*" : $("#username").val());
+            const classifier = $("#type").val();
+            const status = $("#status").val();
+            listAsset(username, classifier, status);
+        });
+
+        $('#add_modal').on('hide.bs.modal', function () {
+            $("#search").trigger("click");
+        });
+
+        $('#add').click(function () {
+            openNewAsset();
+        })
+
+    })
+
+    function ajax_get_hardwareType() {
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/api/asset/getType",
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                const $el = $('#type');
+                $el.empty();
+                $el.append($('<option></option>').attr('value', '*').text("Select a type"));
+                $.each(data, function (index) {
+                    $el.append($('<option></option>').attr('value', data[index]['type']).text(
+                        data[index]['type']
+                    ));
+                });
+            }
+        });
+    }
+
+    function ajax_get_hardwareStatus() {
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/api/asset/getStatus",
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                const $el = $('#status');
+                $el.empty();
+                $el.append($('<option></option>').attr('value', '*').text("Select a status"));
+                $.each(data, function (index) {
+                    $el.append($('<option></option>').attr('value', data[index]['name']).text(
+                        data[index]['name']
+                    ));
+                });
+            }
+        });
+    }
+
+    function listAsset(name,classifier,status){
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url: "row/" + name + "/" +classifier + "/" +status,
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data) {
+                $el = $("#assets");
+                $el.empty();
+                $el.html(data);
+            }
+        });
+    }
+
+
+    function openAsset(id){
+
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url:"asset/"+ id,
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data){
+                $("#newAssetContent").empty();
+                $("#newAssetContent").html(data);
+                $("#add_modal").modal();
+            }
+        })
+    }
+
+    function openNewAsset(){
+
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url:"new",
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data){
+                $("#newAssetContent").empty();
+                $("#newAssetContent").html(data);
+                $("#add_modal").modal();
+            }
+        })
+    }
+
+    function ajax_openDeptEmp(){
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url: "/admin/deptEmp",
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data) {
+                $("#dept_detail").empty();
+                $("#dept_detail").html(data);
+                $("#dept_modal").modal();
+            }
+        })
+    }
+</script>
+</body>
+</html>

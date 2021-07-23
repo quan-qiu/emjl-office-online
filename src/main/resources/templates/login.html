@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>LOGIN</title>
+    <div th:replace="fragments/fragments::html_header('tag')"></div>
+</head>
+<body>
+<div class="mt-5">
+
+    <div th:if="${param.error}" class="row d-flex justify-content-center">
+        <div class='alert alert-danger'><strong th:text="#{login.error}"></strong></div>
+    </div>
+    <div th:if="${param.logout}" class="row d-flex justify-content-center">
+        <div class='alert alert-info'><strong th:text="#{login.logout_msg}"></strong></div>
+    </div>
+    <form th:action="@{/login}" method="post" style="width: 400px; margin:0 auto">
+        <div class="row d-flex justify-content-center">
+            <h3 th:text="#{login.login_emjl}"></h3></div>
+        <div>
+            <label class="text-left" th:text="#{it_asset.username}">:</label>
+            <input class="form-control" type="text"  name="username" required>
+        </div>
+        <div>
+            <label class="text-left mt-2" th:text="#{login.password}">Password:</label>
+            <input class="form-control" type="password" name="password" required>
+        </div>
+
+        <p><input class="form-control btn btn-primary mt-3" type="submit" th:value="#{login.login}"></p>
+    </form>
+</div>
+
+<div th:replace="fragments/fragments::html_js('tag')"></div>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<div class="row" id="prd_msg">
+</div>
+
+<div>
+    <form enctype="multipart/form-data" id="f_file">
+        <table class="table border-0">
+            <tr>
+                <td class="text-right" >
+                    <h5 th:text="#{pr.upload.prd.file}"></h5>
+                </td>
+                <td>
+                    <input type="file" class="btn btn-info" name="file" id="s_file" accept="xlsx"/>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" class="text-center">
+                    <input type="submit" class="btn btn-primary" th:value="#{page.upload.file}" id="upload" />
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+<div id="div_file_uri" class="row d-flex justify-content-center mb-3">
+    <div id="file_uri"></div>
+</div>
+<script th:inline="javascript">
+    $(document).ready(function () {
+
+        $("#upload").click(function (e){
+            e.preventDefault();
+            let file_val = $("#s_file").val();
+
+            if($.trim(file_val) === ""){
+                show_mes("prd_msg",[[#{page.have.to.select.file}]],true);
+            }else{
+                ajax_uploadPrdFie();
+            }
+
+        })
+
+    })
+    function ajax_uploadPrdFie(){
+
+        let form = $('#f_file')[0];
+        let data = new FormData(form);
+
+        $.ajax({
+            type: "POST",
+            enctype: 'multipart/form-data',
+            contentType: false,
+            processData: false,
+            url: "api/pr/prd"  ,
+            data: data,
+            dataType: 'json',
+            cache: false,
+            async: false,
+            timeout: 600000,
+            success: function (data) {
+                //alert(JSON.stringify(data));
+                let $el = $("#prd_msg");
+                $el.empty();
+                $el.html("<div class='alert alert-success'>" +
+                    "<strong>Updated successfully</strong>" +
+                    '</div>');
+
+                let $el_file_uri = $("#file_uri");
+                $el_file_uri.empty();
+                $el_file_uri.html("<a href='"+data["fileDownloadUri"]+"'>"+data["fileName"]+"</a>");
+
+                $("#div_file_uri").show();
+                ajax_loadFromPRDFile(data["fileName"]);
+            }
+        })
+    }
+
+    function ajax_loadFromPRDFile(fileName){
+
+        let prm_id =/*[[${prmId}]]*/ 'default';
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "api/pr/prd/loadFromFile/" + fileName + "/" + prm_id  ,
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                alert(JSON.stringify(data));
+
+            }
+        })
+
+    }
+
+
+</script>

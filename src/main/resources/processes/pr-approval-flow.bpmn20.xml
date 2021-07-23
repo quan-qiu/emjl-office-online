@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.flowable.org/processdef">
+
+    <process id="PR-Request" name="Procurement Request" isExecutable="true">
+
+        <startEvent id="startPREvent" name="PR instance started"/>
+        <sequenceFlow sourceRef="startPREvent" targetRef="auditApproveTask"/>
+
+        <userTask id="auditApproveTask" name="AUDIT approval" flowable:candidateGroups="PR-AUDITOR"/>
+        <sequenceFlow sourceRef="auditApproveTask" targetRef="auditDecision"/>
+
+        <exclusiveGateway id="auditDecision"/>
+        <sequenceFlow sourceRef="auditDecision" targetRef="managerApproveTask">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[
+          ${approved}
+        ]]>
+            </conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow sourceRef="auditDecision" targetRef="sendRejectionMail">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[
+          ${!approved}
+        ]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <userTask id="managerApproveTask" name="Manager approval" flowable:assignee="${managerSsn}"
+                     flowable:class="net.csdcodes.handler.PrProcessApprovalHandler"/>
+        <sequenceFlow sourceRef="managerApproveTask" targetRef="managerDecision"/>
+
+        <exclusiveGateway id="managerDecision"/>
+        <sequenceFlow sourceRef="managerDecision" targetRef="deputyManagerApproveTask">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[
+          ${approved}
+        ]]>
+            </conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow sourceRef="managerDecision" targetRef="sendRejectionMail">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[
+          ${!approved}
+        ]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <userTask id="deputyManagerApproveTask" name="Deputy manager approval" flowable:candidateGroups="PR-DEPUTY-MANAGING-DIRECTOR"
+                  flowable:class="net.csdcodes.handler.PrProcessApprovalHandler"/>
+        <sequenceFlow sourceRef="deputyManagerApproveTask" targetRef="deputyManagerDecision"/>
+
+        <exclusiveGateway id="deputyManagerDecision"/>
+        <sequenceFlow sourceRef="deputyManagerDecision" targetRef="managerDirectorApproveTask">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[
+          ${approved}
+        ]]>
+            </conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow sourceRef="deputyManagerDecision" targetRef="sendRejectionMail">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[
+          ${!approved}
+        ]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <userTask id="managerDirectorApproveTask" name="Manager director approval" flowable:candidateGroups="PR-MANAGING-DIRECTOR"
+                  flowable:class="net.csdcodes.handler.PrProcessApprovalHandler"/>
+        <sequenceFlow sourceRef="managerDirectorApproveTask" targetRef="managerDirectorDecision"/>
+
+        <exclusiveGateway id="managerDirectorDecision"/>
+        <sequenceFlow sourceRef="managerDirectorDecision" targetRef="prApproveTask">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[
+          ${approved}
+        ]]>
+            </conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow sourceRef="managerDirectorDecision" targetRef="sendRejectionMail">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[
+          ${!approved}
+        ]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <serviceTask id="prApproveTask" name="PR After Approved"
+                     flowable:class="net.csdcodes.handler.PrProcessApprovalHandler"/>
+        <sequenceFlow sourceRef="prApproveTask" targetRef="approveEnd"/>
+
+        <serviceTask id="sendRejectionMail" name="PR After Rejection"
+                     flowable:class="net.csdcodes.handler.PrProcessRejectionHandler"/>
+        <sequenceFlow sourceRef="sendRejectionMail" targetRef="rejectEnd"/>
+
+        <endEvent id="approveEnd"/>
+
+        <endEvent id="rejectEnd"/>
+
+    </process>
+
+</definitions>

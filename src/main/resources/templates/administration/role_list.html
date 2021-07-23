@@ -1,0 +1,161 @@
+<h1 class="h2" th:text="#{admin.role_management}"></h1>
+<div class="btn-toolbar mb-2 mb-md-0">
+    <div class="btn-group mr-2">
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="add" th:text="#{admin.add}"></button>
+<!--        <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>-->
+    </div>
+</div>
+<div th:switch="${roles!=null and !roles.empty}">
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-sm text-sm-center">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col"></th>
+                <th scope="col" th:text="#{admin.role}"></th>
+            </tr>
+            </thead>
+            <tr th:each="role,iter:${roles}">
+                <td>
+                    <span th:text="${iter.index +1 }"></span>
+                </td>
+                <td>
+                    <span class='id' hidden th:text="${role.roleId}"></span>
+                    <button  type='button' class='btn btn-link a_update'>
+                        <i class='fa fa-edit fa-lg' style='color: green '></i>
+                    </button>
+                </td>
+                <td>
+                    <samll th:text="${role.name}"></samll>
+                </td>
+
+            </tr>
+        </table>
+    </div>
+    <div class="row" th:case="false">
+        <h5 th:text="#{no.record}"></h5>
+    </div>
+</div>
+
+<div class="modal fade" id="detail_modal" th:fragment="roleContent">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header d-block">
+                <h4 class="modal-title" th:text="#{admin.role.detail}"></h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body mx-auto" id="details">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" data-dismiss="modal" th:text="#{it_asset.close}"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script th:inline="javascript">
+    $(document).ready(function () {
+        $('.a_update').click(function (e) {
+            const id = $(this).parent("td").find(".id").text();
+
+            ajax_openRole(id);
+        });
+
+        $("#add").click(function (){
+            ajax_newRole();
+        })
+
+        $("#detail_modal").on('hidden.bs.modal',function (){
+            $("#role_manage").trigger("click");
+        })
+    })
+
+    function ajax_newRole(){
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url: "admin/role" ,
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data) {
+                $("#details").empty();
+                $("#details").html(data);
+                $("#detail_modal").modal();
+            }
+        })
+    }
+
+    function ajax_openRole(id) {
+
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url: "admin/role/" + id,
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data) {
+                $("#details").empty();
+                $("#details").html(data);
+                $("#detail_modal").modal();
+            }
+        })
+    }
+
+    function show_mes(message,err) {
+        let $el= $("#prd_msg");
+        $el.empty();
+
+        if(err === false){
+            $el.html("<div class='alert alert-success'>" +
+                "<strong>"+message + "</strong>"+
+                '</div>');
+        }else{
+            $el.html("<div class='alert alert-danger'>" +
+                "<strong>"+message + "</strong>"+
+                '</div>');
+        }
+
+    };
+
+    function verification() {
+        var valid = true;
+        const name = $.trim($("#f_name").val());
+
+        if (name === "") {
+            valid = false;
+            show_mes("Role name cannot be empty",true);
+            return valid;
+        }
+
+        let u_role_name = ajax_is_rolename_unique(name);
+        if (u_role_name === true) {
+            valid = false;
+            show_mes("Role name is existing, please input an unique role name.",true);
+            return valid;
+        }
+
+        return valid;
+    }
+
+    function ajax_is_rolename_unique(rolename) {
+        let result = true;
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/api/admin/unique_r/" + rolename,
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                result = data['result'];
+            },
+            error: function () {
+            }
+        });
+        return result;
+
+    }
+</script>

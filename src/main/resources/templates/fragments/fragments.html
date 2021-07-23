@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<head>
+    <div th:fragment="html_header(type)" th:remove="${type}">
+        <meta charset="UTF-8"/>
+        <link th:rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.css}">
+        <link th:rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/font-awesome.css}">
+        <link th:rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-datepicker/css/bootstrap-datepicker.css}">
+        <link th:rel = "icon" th:href = "@{../../static/img/favicon.png}" type = "image/png">
+    </div>
+    <title>EUROMISI Office On Line</title>
+    <script src="fragment.js"></script>
+</head>
+<body>
+
+
+
+<footer th:fragment="html_footer" class="pt-4 my-md-5 pt-md-5 border-top">
+    <div class="row">
+        <div class="col-12 col-md">
+            <h6 th:text="#{index.EUROMISI}"></h6>
+            <small class="d-block mb-3 text-muted">&copy; 2021</small>
+        </div>
+        <div class="col-6 col-md">
+            <small th:text="#{index.user_ip}"></small>:
+            <small th:text="${clientIp}"></small>
+        </div>
+    </div>
+</footer>
+
+<div th:fragment="html_js(type)" th:remove="${type}">
+    <script th:inline="javascript" th:src="@{/webjars/jquery/jquery.js}"></script>
+    <script th:inline="javascript" th:src="@{/webjars/popper.js/umd/popper.js}"></script>
+   <script th:inline="javascript" th:src="@{/webjars/bootstrap/js/bootstrap.js}"></script>
+    <script th:inline="javascript" th:src="@{/webjars/bootstrap-datepicker/js/bootstrap-datepicker.js}"></script>
+    <!--<script src="../static/bootstrap-4.6.0-dist/js/bootstrap.js"></script>-->
+    <script th:inline="javascript" th:src="@{/webjars/holderjs/holder.js}"></script>
+</div>
+
+<!--<div th:fragment="update_asset_1" class="row text-center mx-2">
+    <form>
+        <table>
+            <tr>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label>User name:</label>
+                        <input type="text" class="form-control w-75" id="u_user_name" placeholder="User name" >
+                    </div>
+                </td>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label>Department:</label>
+                        <input type="text" class="form-control w-75" id="u_dept" placeholder="Department">
+                    </div>
+                </td>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label>Asset type:</label>
+                        <input type="text" class="form-control w-100" id="u_asset_type"
+                               placeholder="Asset type">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label>Asset ID:</label>
+                        <input type="text" class="form-control" id="u_asset_id" placeholder="Asset ID">
+                    </div>
+                </td>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label>IT type:</label>
+                        <input type="text" class="form-control" id="u_it_type" placeholder="IT type">
+                    </div>
+                </td>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label>Brand & model:</label>
+                        <input type="text" class="form-control" id="u_brand_model"
+                               placeholder="Brand & model">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label>SN:</label>
+                        <input type="text" class="form-control" id="u_sn" placeholder="SN">
+                    </div>
+                </td>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label>Location:</label>
+                        <input type="text" class="form-control" id="u_location" placeholder="Location">
+                    </div>
+                </td>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label>Purchase date:</label>
+                        <input type="text" class="form-control" id="u_purchase_date"
+                               placeholder="Purchase date">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label>Comment:</label>
+                        <input type="text" class="form-control" id="u_comment" placeholder="Comment">
+                    </div>
+                </td>
+                <td></td><td></td>
+            </tr>
+        </table>
+    </form>
+</div>-->
+
+</body>
+</html>

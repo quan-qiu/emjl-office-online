@@ -1,0 +1,67 @@
+#server:
+#  port: 8080
+
+spring:
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+  messages:
+    basename: messages
+    encoding: UTF-8
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: html5
+    encoding: UTF-8
+    servlet:
+      content-type: text/html
+    cache: true
+  jpa:
+    hibernate:
+      ddl-auto: none
+  servlet:
+    multipart:
+      max-file-size: 16MB
+      max-request-size: 16MB
+      enabled: true
+      file-size-threshold: 2KB
+  datasource:
+    password: Euromisijx89@#
+    url: jdbc:sqlserver://172.16.200.217;databaseName=gateway
+    username: sa
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  mail:
+    host: 183.2.143.59
+    username: euro-misi-it@euro-misi.cn
+    password: 4vWFQHBhVhXHNabg
+    port: 465
+    protocol: smtp
+    default-encoding: UTF-8
+    properties:
+      mail:
+        transport:
+          protocol: smtp
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+          socketFactory:
+            port: 465
+            class: javax.net.ssl.SSLSocketFactory
+            fallback: false
+        debug: false
+
+hr-api-url: http://172.16.200.217:9090
+
+infor-api-url: http://172.16.200.217:9191
+
+app:
+  upload:
+    root-dir: d:/
+    file-root-dir: upload-dir/
+    pr-location-dir: upload-dir/pr-dir/
+    prd-template-dir: upload-dir/pr-dir/prd-template-dir/
+    prd-upload-dir: upload-dir/pr-dir/prd-upload-dir/
+
+page:
+  size: 100

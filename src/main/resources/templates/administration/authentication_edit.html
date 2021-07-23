@@ -1,0 +1,112 @@
+<div class="row" id="msg"></div>
+<div>
+    <div th:object="${user}">
+        <input hidden th:value="*{userId}" id="id">
+        <label th:text="#{admin.user.username}"></label>:<span th:text="*{userName}"></span>
+    </div>
+
+    <form id="f_role">
+        <div id="role_l" class="input-group mb-3">
+        </div>
+    </form>
+    <button class="btn btn-danger" id="btn_submit" th:text="#{it_asset.submit}"></button>
+</div>
+<script th:inline="javascript">
+
+    $(document).ready(function () {
+        /*<![CDATA[*/
+        let u_role = /*[[${urole}]]*/ 'default';
+
+        ajax_getRoles();
+        markRole(u_role);
+
+        $("#btn_submit").on("click", function (e) {
+            e.preventDefault();
+            let id = parseInt($("#id").val());
+            ajax_authentication_update(id);
+        });
+    })
+
+    function markRole(u_role){
+        let u_role_s= new Array();
+        $.each(u_role, function (index){
+            u_role_s.push(u_role[index]['roleId']);
+        })
+
+        let $els =$(".s_role");
+        $.each($els,function (index) {
+            if ($.inArray(parseInt($els[index].value), u_role_s) >=0 ){
+                $els[index].checked = true;
+            }
+        })
+    }
+
+    function ajax_getRoles() {
+
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url: "api/admin/roles",
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data) {
+                let obj = JSON.parse(data);
+
+                let $el = $("#role_l");
+                $el.empty();
+                $.each(obj, function (index) {
+
+                    let $el_item = $("<div class='input-group-text'></div>");
+                    let $el_label = $("<label class='form-check-label mr-2' />").text(obj[index]['name']);
+                    let $el_input = $("<input type='checkbox' class='s_role'>")
+                        .attr('name','roleId')
+                        .attr('value', obj[index]['roleId']);
+                    $el_item.append($el_label);
+                    $el_item.append($el_input);
+                    $el.append($el_item);
+                })
+            }
+        })
+    }
+
+        function ajax_authentication_update(id) {
+            let jsonObj =[];
+            $.each($(".s_role"),function (index){
+                if($(".s_role")[index].checked){
+                    let id= $(this).val();
+                    let role = {};
+                    role['roleId']=parseInt(id);
+                    jsonObj.push(role);
+                }
+            })
+
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: "/api/admin/authentication/"+id,
+                data: JSON.stringify(jsonObj),
+                dataType: 'json',
+                cache: false,
+                async: false,
+                success: function (data) {
+
+                    $el = $("#msg");
+                    $el.empty();
+                    $el.html("<div class='alert alert-success'>" +
+                        "<strong>Updated successfully</strong>" +
+                        '</div>');
+                    $("#detail_modal").modal('hide');
+
+                },
+                error: function (data) {
+
+                    $el = $("#msg");
+                    $el.empty();
+                    $el.html("<div class='alert alert-danger'>" +
+                        "<strong>Updated failed</strong>" + "</div>");
+                }
+            })
+        }
+
+</script>

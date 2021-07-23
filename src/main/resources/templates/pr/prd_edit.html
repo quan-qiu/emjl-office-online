@@ -1,0 +1,186 @@
+<div class="row" id="prd_msg"></div>
+<div>
+    <form th:object="${prd}" id="f_prd">
+        <table class="table border-0">
+            <tr>
+                <td class="text-left">
+                    <div class="form-group">
+                        <input type="text" hidden class="form-control w-100" th:field="*{prMainId}" >
+                        <label th:text="#{pr.details.erp.code} + ':'"></label><i class='fa fa-asterisk'
+                                                                                 style='color: red;font-size: 0.5rem; '></i>
+                       <!-- <input type="text" class="form-control must-have" th:field="*{itemErpCode}" >-->
+                        <div th:if="${ec == 'null'}">
+                            <input  id="itemErpCode" type="text" class="form-control  must-have" th:field="*{itemErpCode}" autocomplete="off"
+                                    list="erpCodeList" placeholder="please enter ERP code"  >
+                            <datalist id="erpCodeList">
+                            </datalist>
+                        </div>
+
+                        <input th:if="${ec != 'null'}" type="text" class="form-control  must-have" name="itemErpCode" th:field="*{itemErpCode}" readonly>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <label th:text="#{pr.details.erp.desc} + ':'"></label><i class='fa fa-asterisk'
+                                                                                 style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control must-have" th:field="*{itemErpDesc}" th:readonly="${ec == 'null'}">
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <label th:text="#{pr.details.erp.desc} + ':'"></label><i class='fa fa-asterisk'
+                                                                                 style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control must-have" th:field="*{itemErpBrandSize}" th:readonly="${ec == 'null'}">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="form-group">
+                        <label th:text="#{pr.details.erp.desc} + ':'"></label><i class='fa fa-asterisk'
+                                                                                 style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control must-have" th:field="*{qty}" >
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <label th:text="#{pr.details.erp.desc} + ':'"></label><i class='fa fa-asterisk'
+                                                                                 style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control must-have" th:field="*{itemErpUnit}" th:readonly="${ec == 'null'}">
+                    </div>
+                </td>estCost
+                <td>
+                    <div class="form-group">
+                        <label th:text="#{pr.details.erp.desc} + ':'"></label><i class='fa fa-asterisk'
+                                                                                 style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control must-have" th:field="*{estCost}" >
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label th:text="#{pr.details.target.date} + ':'"></label><i class='fa fa-asterisk'
+                                                                                style='color: red;font-size: 0.5rem; '></i>
+                    <input type="text" class="form-control must-have" th:field="*{targetDate}" id="f_targetDate" readonly>
+                </td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td class="text-center" colspan="3">
+                    <button class="btn btn-danger" id="btn_edit_submit" th:text="#{it_asset.submit}"></button>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+</div>
+
+<input hidden th:value="${@environment.getProperty('infor-api-url')}" id="infor_api_url">
+
+<script th:inline="javascript">
+
+    $(document).ready(function () {
+
+        const date = new Date();
+        const today = new Date(date.getFullYear(), (date.getMonth()+1), date.getDate());
+
+        $("#f_targetDate").val(date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate());
+
+        $("#f_targetDate").datepicker({
+            format: "yyyy-mm-dd",
+            todayHighlight: true,
+            daysOfWeekHighlighted: "0,6",
+            setDate: today,
+            autoclose: true
+        });
+
+        $("#btn_edit_submit").on("click", function (e) {
+            e.preventDefault();
+            //const valid = verification();
+            const id = /*[[${prd.id}]]*/ 'default';
+            const valid = verification();
+            if (valid) {
+                ajax_prd_update(id);
+            }
+        });
+
+        $("#itemErpCode").keyup(function (){
+            const infor_api_url = $("#infor_api_url").val();
+            const itemErpCode = $("#itemErpCode").val();
+            ajax_fuzzyItemList(infor_api_url,itemErpCode);
+        });
+
+        $("#itemErpCode").focusout(function (){
+            const $el = $("#erpCodeList");
+            const tDsca = $el.find("option").attr('data-tDsca');
+            const tCuni = $el.find("option").attr('data-tCuni');
+            $("#itemErpDesc").val(tDsca);
+            $("#itemErpBrandSize").val(tDsca);
+            $("#itemErpUnit").val(tCuni);
+        })
+    })
+
+    function ajax_prd_update(id) {
+        const json_formData = $('#f_prd').serializeArray()
+            .reduce(function (a, x) {
+                a[x.name] = x.value;
+                return a;
+            }, {});
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/api/pr/prd/"+id,
+            data: JSON.stringify(json_formData),
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                show_mes("prd_msg",[[#{pr.prd.update.success}]],false);
+
+            },
+            error: function (data) {
+                show_mes("prd_msg",[[#{pr.prd.update.fail}]],true);
+            }
+        })
+    }
+    function verification() {
+        let result = true;
+        let input_len = $(".must-have").length;
+
+        for (let i=0; i< input_len; i++){
+            if ($.trim($(".must-have")[i].value) === ""){
+                result = false;
+                show_mes("prd_msg",[[#{page.input.required}]], true);
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    function ajax_fuzzyItemList(infor_api_url, itemCode){
+
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: infor_api_url+"/api/items/" + itemCode,
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                //let obj = JSON.parse(data);
+
+                let $el = $("#erpCodeList");
+                $el.empty();
+
+                $.each(data, function (index) {
+                    let $el_li = $("<option value='" + data[index]['tItem']+ "' data-tDsca='"
+                        + data[index]['tDsca'] + "' data-tCuni='" + data[index]['tCuni']+ "' ></option>");
+                    $el.append($el_li);
+                });
+            }
+        })
+    }
+
+</script>

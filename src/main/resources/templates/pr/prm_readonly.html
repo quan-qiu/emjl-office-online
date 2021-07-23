@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>EUROMISI Office Online</title>
+    <div th:replace="fragments/fragments::html_header('tag')"></div>
+    <script type="text/javascript" th:src="@{/js/utility.js}"></script>
+</head>
+<body>
+
+<div class="card">
+    <div class="card-header">
+        <h5 th:text="#{pr.header}"></h5>
+    </div>
+
+    <table class="table border-0">
+        <tr>
+            <td class="text-left">
+                <div class="form-group">
+                    <strong><h6 th:text="#{pr.title} + ':'"></h6></strong>
+                    <input th:value="${taskId}" id="f_task_id" hidden>
+                    <input th:value="${curtAssignee}" id="f_curt_assignee" hidden>
+                    <input th:value="${nextAssignee}" id="f_next_assignee" hidden>
+                    <input th:value="${userSsn}" id="f_userSsn" hidden>
+                    <input th:value="${managerSsn}" id="f_managerSsn" hidden>
+                    <input type="text" class="form-control w-100" th:value="${prm.id}" id="f_prm_id" hidden>
+                    <input type="text" class="form-control w-100" th:value="${prm.prTitle}" id="f_prTitle">
+                </div>
+            </td>
+
+            <td class="text-left">
+                <strong><label th:text="#{pr.no} + ':'"></label></strong>
+                <h6 th:text="${prm.prNo}"></h6>
+            </td>
+            <td class="text-left">
+                <strong><label th:text="#{pr.flow_type_s} + ':'"></label></strong>
+                <h6 th:text="${prm.flowType}"></h6>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-left">
+                <strong><label th:text="#{pr.apl.username} + ':'"></label></strong>
+                <h6 th:text="${orgName}"></h6>
+            </td>
+            <td class="text-left">
+                <strong><label th:text="#{pr.cost_center} + ':'"></label></strong>
+                <h6 th:text="${prm.costCenter}"/>
+            </td>
+            <td>
+                <strong><label th:text="#{pr.apl.dept} + ':'"></label></strong>
+                <h6 th:text="${prm.aplDept}"/>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-left">
+                <strong><label th:text="#{pr.project.name} + ':'"></label></strong>
+                <h6 th:text="${prm.projectName}"/>
+            </td>
+            <td>
+                <strong><label th:text="#{pr.apl.creation.date} + ':'"></label></strong>
+                <h6 th:text="${#dates.format(prm.prAplDate,'yyyy-MM-dd')}"/>
+            </td>
+            <td colspan="2">
+                <strong><label th:text="#{pr.prm.total.estcost} + ':'"></label></strong>
+                <h6 th:text="${prm.totalEstCost}"/>
+            </td>
+        </tr>
+    </table>
+</div>
+<br>
+<div class="card" th:switch="${prds!=null and !prds.empty}">
+    <div class="card-header">
+        <h5 th:text="#{pr.details.detail}"></h5>
+    </div>
+    <div class="table-responsive" th:case="true">
+        <table class="table table-striped table-bordered table-sm text-sm-center">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col" th:text="#{pr.details.erp.code}"></th>
+                <th scope="col" th:text="#{pr.details.erp.desc}"></th>
+                <th scope="col" th:text="#{pr.details.erp.brand_size}"></th>
+                <th scope="col" th:text="#{pr.details.qty}"></th>
+                <th scope="col" th:text="#{pr.details.erp.unit}"></th>
+                <th scope="col" th:text="#{pr.details.est.cost}"></th>
+                <th scope="col" th:text="#{pr.details.target.date}"></th>
+            </tr>
+            </thead>
+            <tr th:each="prd,iter:${prds}">
+                <td>
+                    <span th:text="${iter.index +1 }"></span>
+                </td>
+                <td>
+                    <samll th:text="${prd.itemErpCode}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.itemErpDesc}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.itemErpBrandSize}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.Qty}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.itemErpUnit}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.estCost}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${#dates.format(prd.targetDate,'yyyy-MM-dd')}"></samll>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="row ml-5" th:case="false">
+        <h5 th:text="#{no.record}"></h5>
+    </div>
+</div>
+<br>
+<div th:if="${taskId !='' and prm.finished != 1}" class="container d-flex flex-row-reverse">
+    <div class="row">
+        <div class="card text-right">
+            <div class="card-header bg-primary">
+                <h5 th:text="#{pr.approve.comment}"></h5>
+            </div>
+            <div class="col-lg text-right">
+                <form>
+                    <ul class="nav">
+                        <li class="nav-item mx-2">
+                            <div class="form-check">
+                                <strong><h6>
+                                    <input type="radio" class="form-check-input" name="optradio" value="1"
+                                           th:text="#{pr.approve.agreed}" checked>
+                                </h6></strong>
+                            </div>
+                        </li>
+                        <li class="nav-item mx-2">
+                            <strong>
+                                <div class="form-check">
+                                    <h6>
+                                        <input type="radio" class="form-check-input" name="optradio" value="0"
+                                               th:text="#{pr.approve.rejected}">
+                                    </h6>
+                                </div>
+                            </strong>
+                        </li>
+                    </ul>
+                    <div class="form-group nav justify-content-center">
+                        <strong class="nav-item"><h6 for="comment" th:text="#{pr.approve.comment}"></h6></strong>
+                        <textarea class="form-control nav-item ml-4" rows="5" style="width: 400px"
+                                  id="comment"></textarea>
+                    </div>
+                    <div class="row d-flex justify-content-end">
+                        <button class="btn btn-primary mr-2" th:text="#{pr.submit.flow}" id="pr_form_submit"></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="text-center ml-3">
+            <div class="row" id="msg"></div>
+        </div>
+    </div>
+
+</div>
+<br>
+<div class="card" th:switch="${prcs!=null and !prcs.empty}">
+    <div class="card-header">
+        <h5 th:text="#{pr.approve.comment}"></h5>
+    </div>
+    <ul th:each="prc,iter:${prcs}">
+        <li>
+            <samll th:text="${prc.userOrgName}"></samll>
+            <samll th:text="${prc.comment}"></samll>
+        </li>
+    </ul>
+</div>
+
+<div class="modal fade" id="pr_confirm_modal">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header d-block">
+                <h4 class="modal-title " th:text="#{pr.submit.flow}"></h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body" id="pr_confirm_details">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" th:text="#{page.close}"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<span id="root_path" th:content="${#httpServletRequest.getContextPath()}" th:text="${#httpServletRequest.getContextPath()}"></span>
+
+
+<div th:replace="fragments/fragments::html_js('tag')"></div>
+<script th:inline="javascript">
+
+    $(document).ready(function () {
+/*        $("#pr_confirm_modal").on('hidden.bs.modal', function () {
+            $("#saved_list").trigger("click");
+        });*/
+
+
+        $("#pr_form_submit").click(function (e) {
+            e.preventDefault();
+
+            const agree = $('input[name="optradio"]:checked').val();
+            const comment = $.trim($("#comment").val());
+            const prMainId = $.trim($("#f_prm_id").val());
+            const taskId = $.trim($("#f_task_id").val());
+            const curtAssignee = $.trim($("#f_curt_assignee").val());
+            const nextAssignee = $.trim($("#f_next_assignee").val());
+            const prTitle = $.trim($("#f_prTitle").val());
+            const userSsn = $.trim($("#f_userSsn").val());
+            const managerSsn = $.trim($("#f_managerSsn").val());
+
+            if (agree === "0") {
+                if (comment === "") {
+                    show_mes("msg", [[#{pr.reject.comment.required}]], true);
+                    return false;
+                }
+            }
+
+            let json_comment = {
+                "prMainId": prMainId,
+                "comment": comment,
+                "approved": agree
+            };
+            //Added comments
+
+            ajax_submitComment(json_comment);
+            //Started work flow
+
+            if (curtAssignee === "PR-MANAGER") {
+
+                ajax_approvalByPerson(managerSsn, taskId, agree);
+
+            } else {
+
+                ajax_approvalByGroup(curtAssignee, taskId, agree);
+            }
+            //updated status of PRM
+            ajax_updatePrmFlowStatus(prMainId, agree, curtAssignee);
+
+            let json_mail;
+            if (agree === "0") {
+                json_mail = {
+                    "from": "euro-misi-it@euro-misi.cn",
+                    "to": userSsn,
+                    "content": "PR process:" + prTitle + " was rejected"
+                };
+                ajax_sentEmail(json_mail, prTitle,prMainId,"FINISHED", "msg");
+            } else {
+                if (nextAssignee === "FINISHED") {
+                    json_mail = {
+                        "from": "euro-misi-it@euro-misi.cn",
+                        "to": userSsn,
+                        "content": "The PR process was approved."
+                    };
+                    ajax_sentEmail(json_mail, prTitle,prMainId,"FINISHED", "msg");
+                } else {
+                    json_mail = {
+                        "from": "euro-misi-it@euro-misi.cn",
+                        "to": nextAssignee,
+                        "content": "Dear role: " + nextAssignee +
+                            ", please proceed the process. "
+                    };
+                    ajax_sentEmail(json_mail, prTitle,prMainId,curtAssignee, "msg");
+                }
+            }
+
+        })
+    })
+
+    function ajax_submitComment(json_comment) {
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/api/pr/prc",
+            data: JSON.stringify(json_comment),
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                show_mes("msg", [[#{page.submission.succeed}]], false);
+
+            },
+            error: function (data) {
+                show_mes("msg", [[#{page.submission.failed}]], true);
+            }
+        })
+    }
+
+    function ajax_approvalByGroup(role, taskId, approved) {
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/api/pr/process/role/" + role + "/approve/tasks/" + taskId + "/" + approved,
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                show_mes("msg", [[#{page.submission.succeed}]], false);
+
+            },
+            error: function (data) {
+                show_mes("msg", [[#{page.submission.failed}]], true);
+            }
+        })
+    }
+
+    function ajax_approvalByPerson(ssn, taskId, approved) {
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/api/pr/process/assignee/" + ssn + "/approve/tasks/" + taskId + "/" + approved,
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                show_mes("msg", [[#{page.submission.succeed}]], false);
+
+            },
+            error: function (data) {
+                show_mes("msg", [[#{page.submission.failed}]], true);
+            }
+        })
+    }
+
+    function ajax_updatePrmFlowStatus(prmId, approved, role) {
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/api/pr/prm/flowStatus/" + prmId + "/" + approved + "/" + role,
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                show_mes("msg", [[#{page.submission.succeed}]], false);
+
+            },
+            error: function (data) {
+                show_mes("msg", [[#{page.submission.failed}]], true);
+            }
+        })
+    }
+
+
+</script>
+</body>
+</html>

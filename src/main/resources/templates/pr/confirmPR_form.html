@@ -1,0 +1,83 @@
+<div class="row justify-content-center" id="confirm_msg"></div>
+<div class="container">
+    <div class="row d-flex justify-content-center align-items-center mx-5">
+        <h4>Select a department manager for approval</h4><i class='fa fa-asterisk'
+                                                            style='color: red;font-size: 0.5rem; '></i>
+        <select class="form-control" id="manager_list">
+            <option value="">Select a manager</option>
+            <option th:each="user : ${roleList}"
+                    th:value="${user.ssn}"
+                    th:text="${user.userName}">
+            </option>
+        </select>
+        <button class="btn btn-danger my-2" th:text="#{pr.submit.flow}" id="submit_flow"></button>
+    </div>
+
+</div>
+<script th:inline="javascript">
+    $(document).ready(function () {
+        $("#submit_flow").click(function (e){
+            e.preventDefault();
+            let result = verification();
+            if( result === true){
+                let mainId = $.trim($("#f_prm_id").val());
+                let dept= $.trim($("#f_aplDept").val());
+                let prTitle = $.trim($("#f_prTitle").val());
+                let managerSsn = $.trim($("#manager_list").val());
+
+                let variables = {
+                    "mainId":mainId,
+                    "dept":dept,
+                    "prTitle":prTitle,
+                    "managerSsn":managerSsn
+                }
+
+                ajax_createPrRequest(variables);
+
+                json_mail = {
+                    "from": "euro-misi-it@euro-misi.cn",
+                    "to": "PR-AUDITOR",
+                    "content": "Dear role: " + "PR-AUDITOR" +
+                        ", please proceed the process. "
+                };
+                ajax_sentEmail(json_mail,prTitle,mainId,"PR-AUDITOR","confirm_msg");
+            }
+        })
+    });
+
+    function verification() {
+        let result = true;
+        let input_len = $(".fa-asterisk").parents("div").find("select").length;
+
+        for (let i=0; i< input_len; i++){
+            if ($.trim($(".fa-asterisk").parents("div").find("select")[i].value) === ""){
+                result = false;
+                show_mes("confirm_msg",[[#{page.input.required}]], true);
+                break;
+            }
+        }
+
+        return result;
+    };
+
+
+    function ajax_createPrRequest(variables){
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/api/pr/process/createPrRequest",
+            data: JSON.stringify(variables),
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                show_mes("confirm_msg","PR process submitted",false);
+            },
+            error: function (data) {
+                show_mes("confirm_msg","PR process couldn't be submitted",true);
+            }
+        })
+    }
+
+</script>

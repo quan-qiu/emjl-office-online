@@ -1,0 +1,138 @@
+<div class="card-header">
+    <h5 th:text="#{pr.name}"></h5>
+</div>
+
+<div class="card mx-2 my-2" th:switch="${prms!=null and !prms.empty}">
+    <table class="table border-0">
+        <tr>
+            <td class="text-left">
+                <strong><label th:text="#{pr.title} + ':'"></label></strong>
+                <h6 th:text="${prm.prTitle}"></h6>
+            </td>
+            <td class="text-left">
+                <strong><label th:text="#{pr.no} + ':'"></label></strong>
+                <h6 th:text="${prm.prNo}"></h6>
+            </td>
+            <td class="text-left">
+                <strong><label th:text="#{pr.flow_type_s} + ':'"></label></strong>
+                <h6 th:text="${prm.flowType}"></h6>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-left">
+                <strong><label th:text="#{pr.apl.username} + ':'"></label></strong>
+                <h6 th:text="${prm.aplUserName}"></h6>
+            </td>
+            <td class="text-left">
+                <strong><label th:text="#{pr.cost_center} + ':'"></label></strong>
+                <h6 th:text="${prm.costCenter}"/>
+            </td>
+            <td>
+                <strong><label th:text="#{pr.apl.dept} + ':'"></label></strong>
+                <h6 th:text="${prm.aplDept}"/>
+            </td>
+        </tr>
+        <tr>
+            <td class="text-left">
+                <strong><label th:text="#{pr.project.name} + ':'"></label></strong>
+                <h6 th:text="${prm.projectName}"/>
+            </td>
+            <td class="text-left">
+                <strong><label th:text="#{pr.status.completed} + ':'"></label></strong>
+                <h6 th:text="${prm.finished==1} ? #{pr.status.completed}:#{pr.status.pending}"/>
+                <span th:if="${prm.finished==1}">
+                        <b><i class="fa fa-check fa-lg" style='color: green '></i></b>
+                    </span>
+                <span th:if="${prm.finished==0}">
+                        <b><i class="fa fa-times fa-lg" style='color: red '></i></b>
+                    </span>
+            </td>
+            <td class="text-left">
+                <strong><label th:text="#{pr.approve.agreed} + ':'"></label></strong>
+                <h6 th:text="${prm.approved==1}? #{pr.approve.agreed}:#{pr.approve.rejected}"/>
+                <span th:if="${prm.approved==1}">
+                        <b><i class="fa fa-check fa-lg" style='color: green '></i></b>
+                    </span>
+                <span th:if="${prm.approved==0}">
+                        <b><i class="fa fa-times fa-lg" style='color: red '></i></b>
+                    </span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong><label th:text="#{pr.apl.creation.date} + ':'"></label></strong>
+                <h6 th:text="${#dates.format(prm.prAplDate,'yyyy-MM-dd')}"/>
+            </td>
+            <td colspan="2">
+                <strong><label th:text="#{pr.prm.total.estcost} + ':'"></label></strong>
+                <h6 th:text="${prm.totalEstCost}"/>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div class="card mx-2 my-2" th:switch="${prds!=null and !prds.empty}">
+    <div class="card-header">
+        <h5 th:text="#{pr.details.detail}"></h5>
+    </div>
+    <div class="table-responsive" th:case="true">
+        <table class="table table-striped table-bordered table-sm text-sm-center">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col" th:text="#{pr.details.erp.code}"></th>
+                <th scope="col" th:text="#{pr.details.erp.desc}"></th>
+                <th scope="col" th:text="#{pr.details.erp.brand_size}"></th>
+                <th scope="col" th:text="#{pr.details.qty}"></th>
+                <th scope="col" th:text="#{pr.details.erp.unit}"></th>
+                <th scope="col" th:text="#{pr.details.est.cost}"></th>
+                <th scope="col" th:text="#{pr.details.target.date}"></th>
+            </tr>
+            </thead>
+            <tr th:each="prd,iter:${prds}">
+                <td>
+                    <span th:text="${iter.index +1 }"></span>
+                </td>
+                <td>
+                    <samll th:text="${prd.itemErpCode}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.itemErpDesc}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.itemErpBrandSize}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.Qty}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.itemErpUnit}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.estCost}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${#dates.format(prd.targetDate,'yyyy-MM-dd')}"></samll>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="row ml-5" th:case="false">
+        <h5 th:text="#{no.record}"></h5>
+    </div>
+</div>
+
+
+<div class="card mx-2 my-2" th:switch="${prcs!=null and !prcs.empty}">
+    <div class="card-header">
+        <h5 th:text="#{pr.approve.comment}"></h5>
+    </div>
+    <ul th:each="prc,iter:${prcs}">
+        <li>
+            <samll th:text="${prc.userOrgName}"></samll>
+            <samll th:text="${prc.comment}"></samll>
+        </li>
+    </ul>
+</div>
+
+

@@ -1,0 +1,147 @@
+<script src="../../static/js/require.js"></script>
+<div class="row" id="msg"></div>
+<div>
+    <div class="input-group mb-2">
+        <label class="mr-lg-5" th:text="#{it_asset.dept}"></label>
+        <button id="btn_root" class="btn btn-info mb-2" th:text="#{company.emjl.short}"></button>
+        <ul class="list-group list-group-horizontal mb-2" style="list-style-type: none" id="dept_list"></ul>
+    </div>
+
+    <ul class="nav mb-lg-2">
+        <li class="nav-item col-md-6">
+            <div class="">
+                <select class="input-group" id="dept_q_list"></select>
+            </div>
+        </li>
+        <li class="nav-item col-md-6">
+            <div class=" input-group">
+                <lable class="mr-lg-5" th:text="#{admin.dept.emp.list}"></lable>
+                <ul class="list-group mb-2" id="emp_list"></ul>
+            </div>
+        </li>
+    </ul>
+    <div class="d-flex justify-content-center">
+        <button class="btn btn-primary text-right" id="btn_confirm" th:text="#{admin.select}"></button>
+    </div>
+
+</div>
+<input hidden th:value="${@environment.getProperty('hr-api-url')}" id="hr_api_url">
+<script th:inline="javascript">
+
+    $(document).ready(function () {
+
+        ajax_getDept($("#hr_api_url").val(),2);
+
+        $("#dept_q_list").on("change", function (e) {
+
+            let dept_id = $(this).val();
+            let dept_name = $("#dept_q_list option:selected").text();
+            ajax_getDeptEmp($("#hr_api_url").val(),dept_id);
+
+            let $el = $("#dept_list");
+            let $el_li = $("<li/>")
+            $el_li.append("<button class='btn btn-primary s_dept' name='" + dept_id + "'>" + dept_name + "</button>");
+            $el.append($el_li);
+
+            $(document).on('click', "button.s_dept", function () {
+
+                let dept_id = $("button.s_dept").attr("name");
+                let el_index = $("button.s_dept").index(this);
+                let len = $("button.s_dept").length;
+
+                for (let i = el_index + 1; i < len; i++) {
+                    $("button.s_dept")[i].remove();
+                }
+                ajax_getDept($("#hr_api_url").val(),dept_id);
+                ajax_getDeptEmp($("#hr_api_url").val(),dept_id);
+            })
+            ajax_getDept($("#hr_api_url").val(),dept_id);
+        })
+
+        $("#btn_root").on("click", function () {
+            let $el_dept = $("#dept_list");
+            $el_dept.empty();
+
+            let $el_emp = $("#emp_list");
+            $el_emp.empty();
+
+            ajax_getDept($("#hr_api_url").val(),2);
+        })
+
+        $("#btn_confirm").on("click", function (e) {
+            e.preventDefault();
+
+            let len = $("button.s_dept").length;
+            let dept_name = "";
+
+            for (let i = 0; i < len; i++) {
+                dept_name = dept_name + " | " + $("button.s_dept")[i].innerHTML;
+            }
+
+            $("#f_dept").val(dept_name);
+            //$("#add_modal #f_dept").val(dept_name);
+            let employee_name = $("input[type=radio]:checked").next().text();
+            let ssn = $("input[type=radio]:checked").attr('name');
+
+            $("#f_orgName").val(employee_name);
+            $("#f_ssn").val(ssn);
+            //$("#add_modal #f_user_name").val(employee_name);
+
+            $("#dept_modal").modal('hide');
+        });
+    })
+
+
+    function ajax_getDept(hr_api_url,id) {
+
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url: hr_api_url+"/api/hr/dept/" + id,
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data) {
+                let obj = JSON.parse(data);
+
+                let $el = $("#dept_q_list");
+                $el.empty();
+                $el.append($('<option></option>').attr('value', '*').text("Select a department"));
+                $.each(obj, function (index) {
+
+                    $el.append($('<option></option>').attr('value', obj[index]['deptId']).text(
+                        obj[index]['deptName']
+                    ));
+
+                });
+            }
+        })
+    }
+
+    function ajax_getDeptEmp(hr_api_url,id) {
+
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url: hr_api_url+"/api/hr/emp/" + id,
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data) {
+                let obj = JSON.parse(data);
+
+                let $el = $("#emp_list");
+                $el.empty();
+
+                $.each(obj, function (index) {
+
+                    let $el_li = $("<li></li>");
+                    $el_li.append($("<input type='radio' class='form-check-input'/>").attr('name', obj[index]['ssn']));
+                    $el_li.append($("<label class='form-check-label'/>").text(obj[index]['name']));
+                    $el.append($el_li);
+                });
+            }
+        })
+    }
+
+</script>

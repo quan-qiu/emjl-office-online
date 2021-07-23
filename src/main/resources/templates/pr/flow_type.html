@@ -1,0 +1,135 @@
+<div class="row justify-content-center" id="msg"></div>
+<div>
+    <form id="f_flow_type">
+        <div class="mb-2 mb-md-0 container">
+            <div class="row">
+                <div class="col-sm form-group mx-2 my-2">
+                    <label for="title" th:text="#{pr.title}"></label>
+                    <i class='fa fa-asterisk' style='color: red;font-size: 0.5rem; '></i>
+                    <input type="text" class="form-control" id="title" name="title" size="50">
+                </div>
+                <div class="col-sm form-group mx-2 my-2">
+
+                <label th:text="#{pr.flow_type}" for="flow_type"></label><i class='fa fa-asterisk' style='color: red;font-size: 0.5rem; '></i>
+
+                <select class="form-control" id="flow_type" name="flow_type">
+                    <option value="" disabled selected>Choose your option</option>
+                    <option th:each="type:${flow_type}" th:text="${type}"></option>
+                </select>
+                </div>
+            </div>
+            <div class="row flex-row">
+                <div class="col-sm form-group mx-2 my-2">
+                    <label th:text="#{pr.cost_center} + ':'" for="costcenter"></label>
+                    <i class='fa fa-asterisk'
+                       style='color: red;font-size: 0.5rem; '></i>
+                    <!--<input type="text" class="form-control" name="costCenter" id="costCenter">-->
+                    <select class="form-control" name="costCenter" id="costCenter">
+                        <option value="">Select a costcenter</option>
+                        <option th:each="cc : ${ccs}"
+                                th:value="${cc.costcenter}"
+                                th:text="${cc.costcenter + '--' + cc.description}"
+                                th:data-desc="${cc.description}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-sm form-group mx-2 my-2">
+                    <label th:text="#{pr.apl.dept} + ':'" for="aplDept"></label>
+                    <input type="text" class="form-control" name="aplDept"  id="aplDept" readonly>
+                </div>
+            </div>
+            <div class="row mx-2 my-2">
+                <div class="col-lg text-center">
+                    <button type="button" class="btn btn-danger" th:text="#{page.submit}" id="submit"></button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script th:inline="javascript">
+    $(document).ready(function () {
+
+        $("#costCenter").change(function (e){
+            const selected = $(this).find('option:selected');
+            const dept = selected.data('desc');
+
+            if(!($(this).val() === "")){
+                $("#aplDept").val(dept);
+            }
+        })
+
+        $("#submit").click(function (e) {
+            e.preventDefault();
+            let isSubmit = verification();
+
+            if (isSubmit){
+                ajax_submit();
+            }
+        })
+    })
+
+    function verification() {
+        let result = true;
+        let input_len = $("input").length;
+        let select_len = $("select").length;
+
+        for (let i=0; i< input_len; i++){
+            if ($.trim($("input")[i].value) === ""){
+                result = false;
+                show_mes("msg", [[#{page.input.required}]],true);
+                break;
+            }
+        }
+
+        for (let i=0; i< select_len; i++){
+            if ($.trim($("select")[i].value) === ""){
+                result = false;
+                show_mes("msg",[[#{page.input.required}]],true);
+                break;
+            }
+        }
+
+        return result;
+    };
+
+
+    function ajax_submit(){
+        const json_formData = $('#f_flow_type').serializeArray()
+            .reduce(function(a, x) { a[x.name] = x.value; return a; }, {});
+
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/api/pr/prm/add/flow_type",
+            data: JSON.stringify(json_formData),
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+
+                $("#flow_type_modal").modal('hide');
+                //ajax_getPRMById(data["newRowId"]);
+            },
+            error: function (jqXHR, exception) {
+                show_mes("msg", "error", true);
+            }
+        })
+    }
+
+    function  ajax_getPRMById(id){
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url: "pr/prm/" + id,
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data) {
+                $el = $("#page_detail");
+                $el.empty();
+                $el.html(data);
+            }
+        })
+    }
+</script>

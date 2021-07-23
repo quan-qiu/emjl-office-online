@@ -1,0 +1,110 @@
+<div class="row" id="msg"></div>
+<div>
+    <form th:object="${ipAddress}" id="f_e_ipAddress">
+        <table class="table border-0">
+            <tr>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{admin.ipaddress.ipaddress} + ':'"></label><i class='fa fa-asterisk'
+                                                                        style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" hidden class="form-control w-100" th:field="*{id}" id="f_id">
+                        <input type="text" class="form-control w-100" th:field="*{ipAddress}" id="f_ipAddress">
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <label th:text="#{admin.ipaddress.type} + ':'"></label><i class='fa fa-asterisk'
+                                                                                   style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" hidden class="form-control w-100" th:field="*{type}" id="f_type">
+                        <select class="form-control" id="s_type"></select>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <label th:text="#{admin.ipaddress.device} + ':'"></label><i class='fa fa-asterisk'
+                                                                                  style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control w-100" th:field="*{device}" id="f_device">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div>
+                        <label th:text="#{admin.ipaddress.id_password} + ':'"></label>
+                        <input type="text" class="form-control w-100" th:field="*{idPassword}" id="f_idPassword">
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        <label th:text="#{admin.ipaddress.comment} + ':'"></label>
+                        <input type="text" class="form-control w-100" th:field="*{comment}" id="f_comment">
+                    </div>
+                </td>
+
+            </tr>
+            <tr>
+                <td class="text-center" colspan="3">
+                    <button class="btn btn-danger" id="btn_submit" th:text="#{it_asset.submit}"></button>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+</div>
+<script th:inline="javascript">
+
+    $(document).ready(function () {
+        ajax_get_hardwareType();
+
+        $("#s_type").on("change",function (){
+            $("#f_type").val(this.value);
+        })
+
+        $("#btn_submit").on("click", function (e) {
+            e.preventDefault();
+
+            const valid = verification();
+            if (valid) {
+                let id = $("#f_id").val();
+
+                ajax_ipAddress_update(id);
+            }
+        });
+
+
+        function ajax_ipAddress_update(id) {
+            const json_formData = $('#f_e_ipAddress').serializeArray()
+                .reduce(function (a, x) {
+                    a[x.name] = x.value;
+                    return a;
+                }, {});
+
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: "/api/admin/ipAddress/"+id,
+                data: JSON.stringify(json_formData),
+                dataType: 'json',
+                cache: false,
+                async: false,
+                success: function (data) {
+
+                    $el = $("#msg");
+                    $el.empty();
+                    $el.html("<div class='alert alert-success'>" +
+                        "<strong>Updated successfully</strong>" +
+                        '</div>');
+                    $("#detail_modal").modal('hide');
+
+                },
+                error: function (data) {
+
+                    $el = $("#msg");
+                    $el.empty();
+                    $el.html("<div class='alert alert-danger'>" +
+                        "<strong>Updated failed</strong>" + "</div>");
+                }
+            })
+        }
+    })
+</script>

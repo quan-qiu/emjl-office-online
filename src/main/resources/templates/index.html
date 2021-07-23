@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Procurement requisition</title>
+    <div th:replace="fragments/fragments::html_header('tag')"></div>
+</head>
+<body>
+<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
+
+    <div class="align-items-start my-0 mr-md-auto">
+        <img class="align-content-start" th:alt-title="#{index.EUROMISI}" th:src="@{../img/euromisi-logo-w.gif}"
+             style="width:150px;height:50px;">
+
+    </div>
+    <div th:if="${isDev}" class="alert-warning">
+        This is the developing model
+    </div>
+    <h4 class="my-0 mr-md-auto font-weight-normal" th:text="#{index.pr}"></h4>
+    <nav class="my-2 my-md-0 mr-md-3">
+        <ul class="navbar-nav text-lg-right list-group-horizontal text-center">
+            <li sec:authorize="isAnonymous()">
+                <i class="fa fa-user-circle-o fa-lg mx-2 control-label" style="color:black"></i>
+            </li>
+            <li sec:authorize="isAnonymous()">
+                <form th:action="@{/login}" method="post">
+                    <input type="submit" th:value="#{login.login}" class="btn btn-primary btn-sm">
+                </form>
+            </li>
+            <li sec:authorize="isAuthenticated()">
+                <a th:href="@{/admin}" th:target="_blank">
+                    <i class="fa fa-user-circle-o fa-lg mx-2" style="color:green"></i>
+                </a>
+            </li>
+            <li sec:authorize="isAuthenticated()">
+                <h6 class="mx-2" th:inline="text">[[${#httpServletRequest.remoteUser}]]</h6>
+            </li>
+            <li sec:authorize="isAuthenticated()">
+                <form th:action="@{/logout}" method="post">
+                    <input type="submit" th:value="#{login.logout}" class="btn btn-primary btn-sm">
+                </form>
+            </li>
+            <li>
+                <span class="mx-1">
+                    <a th:href="@{/(language='zh_CN')}" th:alt="Chinese">
+                    <img class="rounded" th:alt-title="#{index.Chinese}" th:src="@{img/china.png}" style="width:24px;height:24px;">
+                    </a>
+                </span>
+            </li>
+            <li>
+                <span class="mx-1">
+                <a th:href="@{/(language='en_US')}" th:alt="English">
+                    <img class="rounded" th:alt-title="#{index.English}" th:src="@{/img/united-states.png}" style="width:24px;height:24px;">
+                </a>
+                </span>
+            </li>
+        </ul>
+    </nav>
+</div>
+<!--<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h3 class="display-4" th:text="#{index.office_online}"></h3>
+    <p class="lead">Quickly build an effective pricing table for your potential customers with this Bootstrap example. It's built with default Bootstrap components and utilities with little customization.</p>
+</div>-->
+
+<div class="container">
+    <div class="card-deck mb-3 text-center">
+        <div class="card mb-4 box-shadow">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal" th:text="#{index.Infor}"></h4>
+            </div>
+            <div class="card-body">
+                <a th:text="#{index.infor_link}" class="btn btn-primary" target="_blank" href="https://adfsserver.euro-misi.cn/adfs/ls/?wa=wsignin1.0&wtrealm=urn%3aInfor_XiPlatform_L1487112041%3aportal&wctx=rm%3d0%26id%3dpassive%26ru%3d%252finfor%252f4320fa10-2584-479c-90ad-7a4d5f581c67&wct=2021-03-24T05%3a03%3a59Z" role="button">
+                 </a>
+            </div>
+        </div>
+        <div class="card mb-4 box-shadow">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal" th:text="#{index.MES}"></h4>
+            </div>
+            <div class="card-body">
+                <a th:text="#{index.mes_link}" class="btn btn-primary" target="_blank" role="button" href="http://172.16.200.207/InFO/InFO_Login/Login.aspx?ReturnUrl=%2finfo%2f">
+                 </a>
+            </div>
+        </div>
+        <div class="card mb-4 box-shadow">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal" th:text="#{index.Email}"></h4>
+            </div>
+            <div class="card-body">
+                <a class="btn btn-primary" role="button" target="_blank" href="https://exmail.qq.com/login" th:text="#{index.email_link}"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-deck mb-3 text-center">
+        <div class="card mb-4 box-shadow">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal" th:text="#{index.IT_asset}"></h4>
+            </div>
+            <div class="card-body">
+                <a class="btn btn-primary" target="_blank" href="/it-asset/index" role="button" th:text="#{index.IT_asset_link}"></a>
+            </div>
+        </div>
+        <div class="card mb-4 box-shadow">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal" th:text="#{index.calendar}"></h4>
+            </div>
+            <div class="card-body">
+                <a class="btn btn-primary" target="_blank" th:href="@{/calendar}" role="button" th:text="#{index.calendar}"></a>
+            </div>
+        </div>
+        <div class="card mb-4 box-shadow">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal" th:text="#{index.pr}"></h4>
+            </div>
+            <div class="card-body">
+                <a class="btn btn-primary" target="_blank" th:href="@{/pr}" role="button" th:text="#{index.pr}"></a>
+            </div>
+        </div>
+    </div>
+
+
+    <footer th:replace="fragments/fragments::html_footer"></footer>
+</div>
+
+<div th:replace="fragments/fragments::html_js('tag')"></div>
+
+</body>
+</html>

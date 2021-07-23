@@ -1,0 +1,140 @@
+<h4 th:text="#{pr.history}"></h4>
+<form id="f_request_v">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm form-group mx-2 my-2">
+                <label for="finished" th:text="#{pr.work.flow.completed}"></label>
+                <select class="form-control" id="finished" name="finished">
+                    <option value="1">true</option>
+                    <option value="0">false</option>
+                </select>
+            </div>
+            <div class="col-sm form-group mx-2 my-2">
+                <label for="approved" th:text="#{pr.approved}"></label>
+                <select class="form-control" id="approved" name="approved">
+                    <option value="1">true</option>
+                    <option value="0">false</option>
+                </select>
+            </div>
+            <div class="col-sm form-group mx-2 my-2">
+                <label for="pr_start" th:text="#{pr.apl.start.date}"></label>
+                <div class="form-group input-group" id="pr_start">
+                    <input class="form-control" type="text" id="prmStart" value="" name="prmStart" readonly aria-describedby="button-addon2">
+                    <div class="input-group-append">
+                        <button class="btn bg-transparent btn-outline-secondary cleanup" type="button" id="button-addon2">X</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm form-group mx-2 my-2">
+                <label for="pr_end" th:text="#{pr.apl.end.date}"></label>
+                <div class="form-group input-group" id="pr_end">
+                    <input class="form-control" type="search" id="prmEnd" value="" name="prmEnd" readonly aria-describedby="button-addon1">
+                    <div class="input-group-append">
+                        <button class="btn bg-transparent btn-outline-secondary cleanup" type="button" id="button-addon1">X</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mx-2">
+            <div class="col-lg text-center">
+                <button class="btn btn-primary" th:text="#{page.submit}" id="submit"></button>
+                <a class="btn btn-info ml-3" th:href="@{/pr/prm/download/}" id="export-excel">Export to Excel</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="mt-2" id="history_prm"></div>
+
+<script th:inline="javascript">
+
+    $(document).ready(function () {
+        const date = new Date();
+        const today = new Date(date.getFullYear(), (date.getMonth() + 1), date.getDate());
+
+        $("#prmStart").datepicker({
+            format: "yyyy-mm-dd",
+            todayHighlight: true,
+            daysOfWeekHighlighted: "0,6",
+            setDate: today,
+            autoclose: true
+        });
+
+        $("#prmEnd").datepicker({
+            format: "yyyy-mm-dd",
+            todayHighlight: true,
+            daysOfWeekHighlighted: "0,6",
+            setDate: today,
+            autoclose: true
+        });
+
+        $("#button-addon1,#button-addon2").click(function (){
+            $(this).parent().siblings("input").val("");
+        })
+
+        $("#submit").click(function (e) {
+            e.preventDefault();
+            ajax_queryPRMHistory();
+        })
+
+
+        $("#export-excel").click(function (e){
+            e.preventDefault();
+
+            const completed = $("#finished").val();
+            const agreed = $("#approved").val();
+            const start = $.trim($("#prmStart").val())==="" ? "null" : $.trim($("#prmStart").val());
+            const end = $.trim($("#prmEnd").val()) === "" ? "null" : $.trim($("#prmEnd").val());
+
+            let href = e.target.href + completed + "/" + agreed + "/" + start + "/" + end;
+
+            window.location = href;
+        })
+    })
+
+    function ajax_queryPRMHistory() {
+        const json_formData = $('#f_request_v').serializeArray()
+            .reduce(function (a, x) {
+                a[x.name] = x.value;
+                return a;
+            }, {});
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/pr/prm/history/query",
+            data: JSON.stringify(json_formData),
+            dataType: "html",
+            cache: false,
+            async: false,
+            success: function (data) {
+                let $el = $("#history_prm");
+                $el.empty();
+                $el.html(data);
+            }
+        })
+    }
+
+    function ajax_exportExcel(){
+        const completed = $("#finished").val();
+        const approved = $("#approved").val();
+        const prmStart = $.trim($("#prmStart").val()) === "" ? "n" : $.trim($("#prmStart").val());
+        const prmEnd = $.trim($("#prmEnd").val()) === "" ? "n" : $.trim($("#prmEnd").val());
+/*        const json_formData = $('#f_request_v').serializeArray()
+            .reduce(function (a, x) {
+                a[x.name] = x.value;
+                return a;
+            }, {});*/
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/pr/prm/download/" + completed + "/" + approved + "/" + prmStart + "/"+ prmEnd ,
+            dataType: "application/octet-stream",
+            cache: false,
+            async: false,
+            success: function () {
+
+            }
+        })
+    }
+</script>

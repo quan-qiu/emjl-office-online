@@ -1,0 +1,100 @@
+<div class="row" id="msg"></div>
+<div class="row d-flex justify-content-center">
+    <form th:object="${calendar}" id="f_calendar">
+        <table>
+            <tr>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{calendar.special_day}">:<i class='fa fa-asterisk fa-xs' style='color: red;font-size: 0.5rem; '></i></label>
+                        <input type="text" class="form-control w-100" th:field="*{specialDate}" id="f_special_date">
+                    </div>
+                </td>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{calendar.type}">:<i class='fa fa-asterisk' style='color: red;font-size: 0.5rem; '></i></label>
+                        <input type="text" class="form-control w-100" th:field="*{type}" id="f_type">
+                    </div>
+                </td>
+
+            </tr>
+
+            <tr>
+                <td class="text-center" colspan="3">
+                    <button th:text="#{it_asset.submit}" id="c_submit" class="btn btn-danger" />
+                </td>
+            </tr>
+        </table>
+    </form>
+
+</div>
+
+<script th:inline="javascript">
+    $(document).ready(function () {
+
+        const date = new Date();
+        const today = new Date(date.getFullYear(), (date.getMonth()+1), date.getDate());
+
+        $("#f_special_date").val(date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate());
+
+        $("#f_special_date").datepicker({
+            format: "yyyy-mm-dd",
+            todayHighlight: true,
+            daysOfWeekHighlighted: "0,6",
+            setDate: today,
+            autoclose: true
+        });
+
+        $("#c_submit").on("click", function (e) {
+            e.preventDefault();
+            const valid = verification();
+
+            if (valid) {
+                ajax_calendar_save();
+            }
+        });
+    })
+
+    function verification(){
+        let valid = true;
+        if ($.trim($('#f_special_date').val()) === ""){
+            valid = false;
+            show_mes("Field marked with red stars must be filled a value",true)
+            return valid;
+        }
+        return valid;
+    }
+
+    function ajax_calendar_save(){
+        const json_formData = $('#f_calendar').serializeArray()
+            .reduce(function(a, x) { a[x.name] = x.value; return a; }, {});
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/api/calendar/save",
+            data: JSON.stringify(json_formData),
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                alert(JSON.stringify(data));
+                //$(this).modal('hide');
+                $el= $("#msg");
+                $el.empty();
+                $el.html("<div class='alert alert-success'>" +
+                    "<strong>Calendar was added successfully</strong>"+
+                    '</div>');
+
+
+            },
+            error: function (jqXHR, exception) {
+                $el= $("#msg");
+                $el.empty();
+
+                $el.html("<div class='alert alert-danger'>" +
+                    "<strong>Updated failed</strong>"+ "</div>");
+            }
+        })
+    }
+
+</script>

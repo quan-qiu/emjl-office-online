@@ -1,0 +1,138 @@
+<div class="row" id="prd_msg"></div>
+<div>
+    <form th:object="${prd}" id="f_prd">
+        <table class="table border-0">
+            <tr>
+                <td class="text-left">
+                    <div class="form-group">
+                        <input type="text" hidden class="form-control w-100" th:field="*{prMainId}" >
+                        <label th:text="#{pr.details.erp.code} + ':'"></label><i class='fa fa-asterisk'
+                                                                                 style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control w-100" th:field="*{itemErpCode}" >
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <label th:text="#{pr.details.erp.desc} + ':'"></label><i class='fa fa-asterisk'
+                                                                                 style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control w-100" th:field="*{itemErpDesc}" >
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <label th:text="#{pr.details.erp.desc} + ':'"></label><i class='fa fa-asterisk'
+                                                                                 style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control w-100" th:field="*{itemErpBrandSize}" >
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="form-group">
+                        <label th:text="#{pr.details.erp.desc} + ':'"></label><i class='fa fa-asterisk'
+                                                                                 style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control w-100" th:field="*{qty}" >
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <label th:text="#{pr.details.erp.desc} + ':'"></label><i class='fa fa-asterisk'
+                                                                                 style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control w-100" th:field="*{itemErpUnit}" >
+                    </div>
+                </td>estCost
+                <td>
+                    <div class="form-group">
+                        <label th:text="#{pr.details.erp.desc} + ':'"></label><i class='fa fa-asterisk'
+                                                                                 style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control w-100" th:field="*{estCost}" >
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label th:text="#{pr.details.target.date} + ':'"></label><i class='fa fa-asterisk'
+                                                                                style='color: red;font-size: 0.5rem; '></i>
+                    <input type="text" class="form-control w-100" th:field="*{targetDate}" id="f_targetDate" readonly>
+                </td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td class="text-center" colspan="3">
+                    <button class="btn btn-danger" id="btn_edit_submit" th:text="#{it_asset.submit}"></button>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+</div>
+<script th:inline="javascript">
+
+    $(document).ready(function () {
+
+        const date = new Date();
+        const today = new Date(date.getFullYear(), (date.getMonth()+1), date.getDate());
+
+        $("#f_targetDate").val(date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate());
+
+        $("#f_targetDate").datepicker({
+            format: "yyyy-mm-dd",
+            todayHighlight: true,
+            daysOfWeekHighlighted: "0,6",
+            setDate: today,
+            autoclose: true
+        });
+
+        $("#btn_edit_submit").on("click", function (e) {
+            e.preventDefault();
+            //const valid = verification();
+            const id = /*[[${prd.id}]]*/ 'default';
+            const valid = verification();
+            if (valid) {
+                ajax_prd_update(id);
+            }
+        });
+
+    })
+
+    function ajax_prd_update(id) {
+        const json_formData = $('#f_prd').serializeArray()
+            .reduce(function (a, x) {
+                a[x.name] = x.value;
+                return a;
+            }, {});
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/api/pr/prd/"+id,
+            data: JSON.stringify(json_formData),
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                show_mes("prd_msg", [[#{pr.prd.update.success}]],false);
+
+            },
+            error: function (data) {
+                show_mes("prd_msg", [[#{pr.prd.update.fail}]],true);
+            }
+        })
+    }
+    function verification() {
+        let result = true;
+        let input_len = $(".fa-asterisk").parents("div").find("input").length;
+
+        for (let i=0; i< input_len; i++){
+            if ($.trim($(".fa-asterisk").parents("div").find("input")[i].value) === ""){
+                result = false;
+                show_mes("prd_msg", [[#{page.input.required}]], true);
+                break;
+            }
+        }
+
+        return result;
+    };
+
+
+</script>

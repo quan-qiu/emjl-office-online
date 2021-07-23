@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>EUROMISI Calendar</title>
+    <!--    <link th:rel="stylesheet" type="text/css" th:href="@{../../css/bootstrap-3.3.5-dist/css/bootstrap.css}">
+        <link th:rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/font-awesome.css}">
+        <link th:rel="stylesheet" type="text/css"
+              th:href="@{/webjars/bootstrap-year-calendar/css/bootstrap-year-calendar.min.css}">-->
+
+    <!-- calendar needs bootstrap 3-->
+    <link rel="stylesheet" type="text/css" href="https://www.bootstrap-year-calendar.com/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://www.bootstrap-year-calendar.com/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" type="text/css" href="https://www.bootstrap-year-calendar.com/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://www.bootstrap-year-calendar.com/css/bootstrap-year-calendar.min.css">
+    <link rel="stylesheet" type="text/css" href="https://www.bootstrap-year-calendar.com/css/font-awesome.min.css">
+
+</head>
+<body>
+<div class="row" style="margin-top: 20px">
+    <div class="col-md-3">
+        <a th:href="@{/}">
+            <img class="align-content-start" th:alt-title="#{index.EUROMISI}" th:src="@{../img/euromisi-logo-w.gif}"
+                 style="width:150px;height:50px;">
+        </a>
+    </div>
+    <div class="col-md-6 text-center">
+        <h3 th:text="#{calendar.company}"></h3>
+    </div>
+
+</div>
+
+
+<div id="calendar" class="calendar mx-5 mt-lg-5">
+</div>
+
+
+<!--<script th:inline="javascript" th:src="@{/webjars/jquery/jquery.js}"></script>
+<script th:inline="javascript" th:src="@{../../css/bootstrap-3.3.5-dist/js/bootstrap.js}"></script>
+<script th:inline="javascript" th:src="@{webjars/bootstrap-year-calendar/js/bootstrap-year-calendar.js}"></script>-->
+
+<script src="https://www.bootstrap-year-calendar.com/js/jquery-1.10.2.min.js"></script>
+<script src="https://www.bootstrap-year-calendar.com/js/bootstrap.min.js"></script>
+<script src="https://www.bootstrap-year-calendar.com/js/bootstrap-datepicker.min.js"></script>
+<script src="https://www.bootstrap-year-calendar.com/js/bootstrap-year-calendar.min.js"></script>
+<script src="https://www.bootstrap-year-calendar.com/js/bootstrap-popover.js"></script>
+
+<script>
+    $(document).ready(function () {
+        const currentYear = new Date().getFullYear();
+
+        /*const circleDateTime = [new Date(currentYear, 1, 20).getTime()
+        ,new Date(currentYear, 1, 9).getTime(),
+            new Date(currentYear, 1, 10).getTime(),
+            new Date(currentYear, 1, 11).getTime(),
+            new Date(currentYear, 1, 12).getTime(),
+            new Date(currentYear, 1, 15).getTime(),
+            new Date(currentYear, 1, 16).getTime(),
+            new Date(currentYear, 1, 17).getTime(),
+            new Date(currentYear, 3, 5).getTime(),
+        ];*/
+
+        const circleDateTime = ajax_get_holiday(currentYear);
+
+        $('#calendar').calendar({
+            displayWeekNumber: true,
+            customDayRenderer: function (element, date) {
+                if (date.getDay() === 6 || date.getDay() === 0) {
+                    $(element).css('background-color', 'pink');
+                    $(element).css('border-radius', '15px');
+                }
+                ;
+                if (circleDateTime.indexOf(date.getTime()) >= 0) {
+                    $(element).css('background-color', 'red');
+                    $(element).css('color', 'white');
+                    $(element).css('border-radius', '15px');
+                }
+            }
+        });
+
+
+    })
+
+    function ajax_get_holiday(year) {
+        let dateTime = [];
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/api/calendar/list/" + year,
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                $.each(data, function (index) {
+                    dateTime.push(new Date(data[index][0], data[index][1], data[index][2]).getTime())
+                });
+                console.log(dateTime);
+            }
+        })
+
+        return dateTime;
+    }
+</script>
+
+</body>
+</html>

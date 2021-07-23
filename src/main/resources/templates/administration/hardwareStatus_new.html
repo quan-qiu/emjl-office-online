@@ -1,0 +1,82 @@
+<div class="row" id="msg"></div>
+<div>
+    <form th:object="${hardwareStatus}" id="f_hardwareStatus">
+        <table class="table border-0">
+            <tr>
+                <td class="text-left">
+                    <div class="form-group">
+                        <label th:text="#{admin.hardware.status} + ':'"></label><i class='fa fa-asterisk'
+                                                                        style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" hidden class="form-control w-100" th:field="*{id}" id="f_id">
+                        <input type="text" class="form-control w-100" th:field="*{name}" id="f_name">
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <label th:text="#{admin.hardware.seq_id} + ':'"></label><i class='fa fa-asterisk'
+                                                                                   style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control w-100" th:field="*{seqId}" id="f_seqId">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-center" colspan="2">
+                    <button class="btn btn-danger" id="btn_submit" th:text="#{it_asset.submit}"></button>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+</div>
+<script th:inline="javascript">
+
+    $(document).ready(function () {
+
+        $("#btn_submit").on("click", function (e) {
+            e.preventDefault();
+
+            const valid = verification();
+            if (valid) {
+                let id = $("#f_id").val();
+
+                ajax_hardwareStatus_new();
+            }
+        });
+
+
+        function ajax_hardwareStatus_new() {
+            const json_formData = $('#f_hardwareStatus').serializeArray()
+                .reduce(function (a, x) {
+                    a[x.name] = x.value;
+                    return a;
+                }, {});
+
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: "/api/admin/hstatus/",
+                data: JSON.stringify(json_formData),
+                dataType: 'json',
+                cache: false,
+                async: false,
+                success: function (data) {
+
+                    $el = $("#msg");
+                    $el.empty();
+                    $el.html("<div class='alert alert-success'>" +
+                        "<strong>Updated successfully</strong>" +
+                        '</div>');
+                    $("#detail_modal").modal('hide');
+
+                },
+                error: function (data) {
+
+                    $el = $("#msg");
+                    $el.empty();
+                    $el.html("<div class='alert alert-danger'>" +
+                        "<strong>Updated failed</strong>" + "</div>");
+                }
+            })
+        }
+    })
+</script>

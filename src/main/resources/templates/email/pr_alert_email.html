@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Response email from the administrator</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+</head>
+<body class="bg-light">
+<div class="container">
+    <div class="py-5 text-center">
+        <h3>Notification from PR process administrator</h3>
+    </div>
+    <div class="row">
+        <span>PR process: </span> <b><h4 th:text="${prTitle}"></h4></b>
+        <b><h4 th:text="${mailContent}"></h4></b>
+        <div th:if="${curtAssignee != 'FINISHED'}">
+            <a th:href="${conPath + '/pr/prm/read/' + prmId}">Approval link</a>
+        </div>
+
+    </div>
+</div>
+<br><br>
+<footer class="my-5 pt-5 text-muted text-center text-small">
+    <p>Visit the PR process website to read more details.</p><a href="http://172.16.200.217:8080">EUROMISI office on line</a>
+    <P>This is an automation mail sender, don't reply to the sender.</P>
+    <p class="mb-1">&copy; EURO-MISI</p>
+</footer>
+</body>
+</html>

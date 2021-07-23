@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Internationalization example - Spring Boot</title>
+
+   <!-- <link th:rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.css}">-->
+</head>
+<body>
+<nav class="site-header sticky-top py-1 bg-dark" >
+    <div class="container d-flex flex-column flex-md-row justify-content-between">
+        <a class="py-2" href="#">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                 class="d-block mx-auto">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="14.31" y1="8" x2="20.05" y2="17.94"></line>
+                <line x1="9.69" y1="8" x2="21.17" y2="8"></line>
+                <line x1="7.38" y1="12" x2="13.12" y2="2.06"></line>
+                <line x1="9.69" y1="16" x2="3.95" y2="6.06"></line>
+                <line x1="14.31" y1="16" x2="2.83" y2="16"></line>
+                <line x1="16.62" y1="12" x2="10.88" y2="21.94"></line>
+            </svg>
+        </a>
+
+        <ul class="navbar-nav text-lg-right list-group-horizontal text-center">
+            <li>
+                <a th:href="@{/welcome(language='zh_CN')}" th:alt="Chinese">
+                    <img class="rounded" th:alt="Chinese" th:src="@{img/china.png}" style="width:24px;height:24px;">|
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/welcome(language='en_US')}" th:alt="English">
+                    <img class="rounded" th:alt="English" th:src="@{/img/united-states.png}" style="width:24px;height:24px;">
+                </a>
+            </li>
+        </ul>
+        <p th:inline="text">Welcome [[${#httpServletRequest.remoteUser}]]</p>
+        <form th:action="@{/logout}" method="post">
+            <input type="submit" value="Logout" />
+        </form>
+    </div>
+</nav>
+<div>
+    <h4 th:text="#{welcome.message}"></h4>
+    <h4 th:text="#{hello.message}"></h4>
+    <h5 th:text="#{language.link}"></h5>
+
+    <span th:text="#{language.lang}"></span> :
+
+    <a th:href="@{/welcome(language='en_US')}" th:text="#{language.en}"></a>
+    <a th:href="@{/welcome(language='fr')}" th:text="#{language.fr}"></a>
+
+    <a th:href="@{/welcome(language='fr_FR')}" th:text="#{language.fr}"></a>
+
+    <a th:href="@{/welcome(language='zh_CN')}" th:text="#{language.zh}"></a>
+
+    <a th:href="@{/hello}" th:text="#{hello.message}"></a>
+
+
+<!--    <script th:inline="javascript" th:src="@{/webjars/jquery/jquery.js}"></script>
+    <script th:inline="javascript" th:src="@{/webjars/bootstrap/js/bootstrap.js}"></script>-->
+</div>
+
+</body>
+</html>

@@ -1,0 +1,538 @@
+<h4 th:text="#{pr.edit}"></h4>
+<div class="row" id="msg"></div>
+<div class="card">
+    <div class="card-header">
+        <h5 th:text="#{pr.header}"></h5>
+    </div>
+    <form th:object="${prm}" id="f_prm">
+        <div class="mb-2 mb-md-0 container">
+            <div class="row">
+                <div class="col-sm form-group">
+                    <div class="form-group">
+                        <label th:text="#{pr.title} + ':'" for="f_prTitle"></label><i class='fa fa-asterisk'
+                                                                                      style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control" th:field="*{id}" id="f_prm_id" hidden>
+                        <input type="text" class="form-control" th:field="*{prTitle}" id="f_prTitle">
+                    </div>
+                </div>
+                <div class="col-sm form-group">
+                    <div class="form-group">
+                        <label th:text="#{pr.cost_center} + ':'" for="f_costCenter"></label>
+                        <i class='fa fa-asterisk'
+                           style='color: red;font-size: 0.5rem; '></i>
+
+                        <select class="form-control" name="costCenter" id="f_costCenter" th:field="*{costCenter}">
+                            <option value="">Select a costcenter</option>
+                            <option
+                                    th:each="cc : ${ccs}"
+                                    th:selected="${cc.costcenter == prm.costCenter}"
+                                    th:value="${cc.costcenter}"
+                                    th:text="${cc.costcenter + '--' + cc.description}"
+                                    th:data-desc="${cc.description}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm form-group">
+                    <div class="form-group">
+                        <label th:text="#{pr.apl.dept} + ':'" for="f_aplDept"></label>
+                        <i class='fa fa-asterisk'
+                           style='color: red;font-size: 0.5rem; '></i>
+                        <input type="text" class="form-control" th:field="*{aplDept}" id="f_aplDept" readonly>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-sm form-group">
+                    <div class="form-group">
+                        <label th:text="#{pr.flow_type_s} + ':'" for="f_flowType"></label>
+                        <input class="form-control" type="text" th:field="*{flowType}" readonly id="f_flowType">
+                    </div>
+                </div>
+                <div class="col-sm form-group">
+                    <div class="form-group">
+                        <label th:text="#{pr.prm.total.estcost} + ':'" for="f_etc"></label>
+                        <input type="text" class="form-control" th:field="*{totalEstCost}" id="f_etc" readonly>
+                    </div>
+                </div>
+                <div class="col-sm form-group">
+                    <div class="form-group">
+                        <label th:text="#{pr.no} + ':'" for="f_etc"></label>
+                        <input type="text" class="form-control" th:field="*{prNo}" id="f_prno" readonly>
+                    </div>
+                </div>
+            </div>
+            <div class="row" th:if="${prm.flowType != 'RM_ASSEMBLY_MRO'} ">
+                <div th:switch="${prm.flowType}">
+                    <div th:case="'EXPENSE'" class="col-sm form-group">
+                        <div class="form-group">
+                            <label th:text="#{pr.project.name} + ':'" for="f_projectName"></label>
+                            <i class='fa fa-asterisk'
+                               style='color: red;font-size: 0.5rem; '></i>
+                            <!-- <input type="text" class="form-control" th:field="*{projectName}" id="f_projectName">-->
+                            <select class="form-control" name="projectName" id="f_projectName" th:field="*{projectName}">
+                                <option value="">Select a project</option>
+                                <option th:each="ct : ${cts}"
+                                        th:selected="${ct.costType == prm.projectName}"
+                                        th:value="${ct.costType}"
+                                        th:text="${ct.costType + '--' + ct.erpCode}"
+                                        th:data-erp="${ct.erpCode}">
+                                </option>
+                            </select>
+
+                        </div>
+                    </div>
+                    <div th:case="'CAPITALIZED_PROJECT_FIXED_ASSET'" class="col-sm form-group">
+                        <div class="form-group">
+                            <label th:text="#{pr.project.name} + ':'" for="f_projectName"></label>
+                            <i class='fa fa-asterisk'
+                               style='color: red;font-size: 0.5rem; '></i>
+                            <!-- <input type="text" class="form-control" th:field="*{projectName}" id="f_projectName">-->
+                            <select class="form-control" name="projectName" id="f_projectName" th:field="*{projectName}">
+                                <option value="">Select a project</option>
+                                <option th:each="pp : ${pps}"
+                                        th:selected="${pp.projectName == prm.projectName}"
+                                        th:value="${pp.projectName}"
+                                        th:text="${pp.projectName + '--' + pp.erpCode}"
+                                        th:data-erp="${pp.erpCode}">
+                                </option>
+                            </select>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm form-group">
+                    <span id="erp_code"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg text-center">
+                    <button class="btn btn-sm btn-primary" id="btn_prm_update" th:text="#{pr.prm.update}"></button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="card mt-2" th:switch="${prds!=null and !prds.empty}">
+    <div class="card-header">
+        <h5 th:text="#{pr.details.detail}"></h5>
+    </div>
+    <div class="row my-1">
+        <div class="d-flex justify-content-start btn-group mr-4 ml-4">
+            <button type="button" class="btn btn-sm btn-primary mr-2" id="prd_add" th:text="#{record.add}"></button>
+            <div th:if="${prm.flowType == 'RM_ASSEMBLY_MRO' }">
+                <button type="button" class="btn btn-sm btn-primary mr-2" id="prd_upload"
+                        th:text="#{pr.upload.prd.file}"></button>
+                <a th:href="${templateUrl}" type="button" class="btn btn-sm btn-info mr-2" id="template_download" download
+                   th:text="#{pr.download.prd.temp.file}"></a>
+            </div>
+
+        </div>
+        <div class="d-flex justify-content-end" th:if="${prds.size() > 0}">
+            <button class="btn btn-primary mr-2" th:text="#{pr.submit.flow}" id="pr_form_submit"></button>
+        </div>
+    </div>
+    <div class="table-responsive" th:case="true">
+        <table class="table table-striped table-bordered table-sm text-sm-center">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col"></th>
+                <th scope="col" th:text="#{pr.details.erp.code}"></th>
+                <th scope="col" th:text="#{pr.details.erp.desc}"></th>
+                <th scope="col" th:text="#{pr.details.erp.brand_size}"></th>
+                <th scope="col" th:text="#{pr.details.qty}"></th>
+                <th scope="col" th:text="#{pr.details.erp.unit}"></th>
+                <th scope="col" th:text="#{pr.details.est.cost}"></th>
+                <th scope="col" th:text="#{pr.details.target.date}"></th>
+            </tr>
+            </thead>
+            <tr th:each="prd,iter:${prds}">
+                <td>
+                    <span th:text="${iter.index +1 }"></span>
+                </td>
+                <td>
+                    <span class='id' hidden th:text="${prd.id}"></span>
+                    <button type='button' class='btn btn-link a_update'>
+                        <i class='fa fa-edit fa-lg' style='color: green'></i>
+                    </button>
+                    <button type='button' class='btn btn-link a_delete'>
+                        <i class='fa fa-trash-o fa-lg' style='color: red '></i>
+                    </button>
+                </td>
+                <td>
+                    <samll class="l_erpCode" th:text="${prd.itemErpCode}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.itemErpDesc}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.itemErpBrandSize}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.Qty}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.itemErpUnit}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.estCost}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${#dates.format(prd.targetDate,'yyyy-MM-dd')}"></samll>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="row ml-5" th:case="false">
+        <h5 th:text="#{no.record}"></h5>
+    </div>
+</div>
+
+<div class="modal fade" id="pr_detail_modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header d-block">
+                <h4 class="modal-title" th:text="#{pr.create}"></h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body mx-auto" id="pr_item_details">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" data-dismiss="modal" th:text="#{page.close}"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="prd_delete_modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header d-block">
+                <h4 class="modal-title " th:text="#{page.delete}"></h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div th:text="#{page.delete.alert}"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="d_submit" th:text="Yes"></button>
+                <button type="button" class="btn btn-info" data-dismiss="modal" th:text="#{page.close}"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="prd_upload_modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header d-block">
+                <h4 class="modal-title " th:text="#{page.upload.file}"></h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body" id="prd_upload_details">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" th:text="#{page.close}"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="pr_confirm_modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header d-block">
+                <h4 class="modal-title " th:text="#{pr.submit.flow}"></h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body" id="pr_confirm_details">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" th:text="#{page.close}"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input hidden th:value="${@environment.getProperty('infor-api-url')}" id="infor_api_url">
+
+<script th:inline="javascript">
+
+    $(document).ready(function () {
+
+        $("#f_projectName").change(function (e){
+            const selected = $(this).find('option:selected');
+            const erp = selected.data('erp');
+
+            if(!($(this).val() === "")){
+                $("#erp_code").text(erp);
+            }
+        })
+
+        $("#f_costCenter").change(function (e){
+            const selected = $(this).find('option:selected');
+            const dept = selected.data('desc');
+
+            if(!($(this).val() === "")){
+                $("#f_aplDept").val(dept);
+            }
+        })
+
+        $("#btn_prm_update").click(function (e) {
+            e.preventDefault();
+            const valid = verification();
+            if (valid === true){
+                let id = $("#f_prm_id").val();
+                ajax_prm_update(id);
+            }
+        })
+
+        $("#prd_add").click(function (e) {
+            e.preventDefault();
+
+            const flow_type= $("#f_flowType").val();
+            switch (flow_type){
+                case "RM_ASSEMBLY_MRO":
+                    ajax_getPrdNewForm($("#f_prm_id").val(), "null");
+                    break;
+                case "EXPENSE":
+                    ajax_getPrdNewForm($("#f_prm_id").val(), "$");
+                    break;
+                case "CAPITALIZED_PROJECT_FIXED_ASSET":
+                    const erp = $("#f_projectName option:selected").data("erp")
+                    ajax_getPrdNewForm($("#f_prm_id").val(), erp);
+                    break;
+            }
+        })
+
+        $(".a_update").click(function (e) {
+            e.preventDefault();
+            let id = $(this).parent("td").find(".id").text();
+
+            const flow_type= $("#f_flowType").val();
+            switch (flow_type){
+                case "RM_ASSEMBLY_MRO":
+                    ajax_getPrdEditForm(id, "null");
+                    break;
+                case "EXPENSE":
+                    ajax_getPrdEditForm(id, "$");
+                    break;
+                case "CAPITALIZED_PROJECT_FIXED_ASSET":
+                    const erp = $("#f_projectName option:selected").data("erp")
+                    ajax_getPrdEditForm(id, erp);
+                    break;
+            }
+
+        })
+
+        $(".a_delete").click(function (e) {
+            e.preventDefault();
+            let id = $(this).parent("td").find(".id").text();
+            ajax_delPrd(id);
+        })
+
+        $(".modal").on('hidden.bs.modal', function () {
+            let id = $("#f_prm_id").val();
+            ajax_getPRMById(id);
+        })
+
+        $("#prd_upload").click(function (e) {
+            let prm_id = $("#f_prm_id").val();
+            ajax_loadUploadFileForm(prm_id);
+        })
+
+        $("#pr_form_submit").click(function (e) {
+            const flow_type= $("#f_flowType").val();
+            if (flow_type === "RM_ASSEMBLY_MRO"){
+                let num = $(".l_erpCode").length;
+                if (num === 0){
+                    return false;
+                }else {
+                    for (let i=0;i<num;i++){
+                        let erpCode = $(".l_erpCode")[i].innerText;
+                        let infor_api_url = $("#infor_api_url").val();
+                        let num = ajax_countItemByErpCode(infor_api_url, erpCode);
+                        //alert(num);
+                        if (num === "0"){
+                            show_mes("msg","ERP code: " + erpCode + " is not existing in ERP, Please check it.", true);
+                            return false;
+                        }
+                    }
+                }
+            }
+            ajax_getConfirmPR_form();
+        })
+
+        $("#pr_confirm_modal").on('hidden.bs.modal', function () {
+            $("#saved_list").trigger("click");
+        })
+    })
+
+    function verification() {
+        let result = true;
+        let input_len = $("input").length;
+        let select_len = $("select").length;
+
+        for (let i=0; i< input_len; i++){
+            if ($.trim($("input")[i].value) === ""){
+                result = false;
+                show_mes("msg", [[#{page.input.required}]],true);
+                break;
+            }
+        }
+
+        for (let i=0; i< select_len; i++){
+            if ($.trim($("select")[i].value) === ""){
+                result = false;
+                show_mes("msg",[[#{page.input.required}]],true);
+                break;
+            }
+        }
+
+        return result;
+    };
+
+    function ajax_getPrdEditForm(id,erpCode) {
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url: "pr/prd/" + id + "/" + erpCode,
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data) {
+                $("#pr_item_details").empty();
+                $("#pr_item_details").html(data);
+                $("#pr_detail_modal").modal();
+            }
+        })
+    }
+
+    function ajax_getPrdNewForm(id,erp_code) {
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url: "/pr/prd/new/" + id + "/" + erp_code,
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data) {
+                $("#pr_item_details").empty();
+                $("#pr_item_details").html(data);
+                $("#pr_detail_modal").modal();
+            }
+        })
+    }
+
+    function ajax_prm_update(id) {
+        const json_formData = $('#f_prm').serializeArray()
+            .reduce(function (a, x) {
+                a[x.name] = x.value;
+                return a;
+            }, {});
+        //alert(JSON.stringify(json_formData));
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "api/pr/prm/update/" + id,
+            data: JSON.stringify(json_formData),
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+
+                $el = $("#msg");
+                $el.empty();
+                $el.html("<div class='alert alert-success'>" +
+                    "<strong>PRM Updated successfully</strong>" +
+                    '</div>');
+
+            },
+            error: function (data) {
+
+                $el = $("#msg");
+                $el.empty();
+                $el.html("<div class='alert alert-danger'>" +
+                    "<strong>PRM Updated failed</strong>" + "</div>");
+            }
+        })
+    }
+
+    function ajax_delPrd(id) {
+
+        $("#prd_delete_modal").modal();
+        $("#prd_delete_modal .modal-footer button").on("click", function (e) {
+            const $button = $(e.target);
+
+            if ($button.text() === "Yes") {
+
+                $.ajax({
+                    type: "DELETE",
+                    contentType: "text/html",
+                    url: "api/pr/prd/" + id,
+                    dataType: 'html',
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        $("#prd_delete_modal").modal('hide');
+                    }
+                })
+            }
+        })
+
+    }
+
+    function ajax_loadUploadFileForm(prd_id) {
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url: "pr/prd/upload/" + prd_id,
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data) {
+                $("#prd_upload_details").empty();
+                $("#prd_upload_details").html(data);
+                $("#prd_upload_modal").modal();
+            }
+        })
+    }
+
+    function ajax_getConfirmPR_form() {
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url: "pr/confirmPR/",
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data) {
+                $("#pr_confirm_details").empty();
+                $("#pr_confirm_details").html(data);
+                $("#pr_confirm_modal").modal();
+            }
+        })
+    }
+
+    function ajax_countItemByErpCode(infor_api_url, erpCode){
+        let num = "";
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: infor_api_url+"/api/count/" + erpCode,
+            dataType: 'text',
+            cache: false,
+            async: false,
+            success: function (data) {
+                num = data;
+            }
+        })
+        return num;
+    }
+
+</script>

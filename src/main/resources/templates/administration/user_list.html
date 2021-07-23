@@ -1,0 +1,269 @@
+<h1 class="h2" th:text="#{admin.user_management}"></h1>
+<div class="btn-toolbar mb-2 mb-md-0">
+    <div class="btn-group mr-2">
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="add">Add</button>
+<!--        <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>-->
+    </div>
+</div>
+<div th:switch="${users!=null and !users.empty}">
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-sm text-sm-center">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col"></th>
+                <th scope="col" th:text="#{admin.user.username}"></th>
+                <th scope="col" th:text="#{admin.user.login.name}"></th>
+                <th scope="col" th:text="#{admin.user.email}"></th>
+                <th scope="col" th:text="#{admin.user.enable}"></th>
+                <th scope="col" th:text="#{it_asset.ssn}"></th>
+                <th scope="col" th:text="#{it_asset.dept}"></th>
+                <th scope="col" th:text="#{admin.created_date}"></th>
+                <th scope="col" th:text="#{admin.updated_date}"></th>
+            </tr>
+            </thead>
+            <tr th:each="user,iter:${users}">
+                <td>
+                    <span th:text="${iter.index +1 }"></span>
+                </td>
+                <td>
+                    <span class='id' hidden th:text="${user.userId}"></span>
+                    <button  type='button' class='btn btn-link a_update'>
+                        <i class='fa fa-edit fa-lg' style='color: green '></i>
+                    </button>
+                </td>
+                <td>
+                    <samll th:text="${user.orgName}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${user.userName}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${user.email}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${user.enable}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${user.ssn}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${user.dept}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${#dates.format(user.createdDate,'yyyy-MM-dd')}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${#dates.format(user.updatedDate,'yyyy-MM-dd')}"></samll>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="row" th:case="false">
+        <h5 th:text="#{no.record}"></h5>
+    </div>
+</div>
+
+<div class="modal fade" id="detail_modal" th:fragment="userContent">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header d-block">
+                <h4 class="modal-title" th:text="#{admin.user.user.detail}"></h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body mx-auto" id="details">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" data-dismiss="modal" th:text="#{it_asset.close}"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dept_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header d-block">
+                <h4 class="modal-title " th:text="#{it_asset.dept}"></h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body" id="dept_detail">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" data-dismiss="modal" th:text="#{it_asset.close}"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    $(document).ready(function () {
+        $('.a_update').click(function (e) {
+            const id = $(this).parent("td").find(".id").text();
+
+            ajax_openUser(id);
+        });
+
+        $("#add").click(function (){
+            ajax_newUser();
+        })
+
+        $("#detail_modal").on('hidden.bs.modal',function (){
+            $("#user_manage").trigger("click");
+        })
+    })
+
+    function ajax_newUser(){
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url: "admin/user" ,
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data) {
+                $("#details").empty();
+                $("#details").html(data);
+                $("#detail_modal").modal();
+            }
+        })
+    }
+
+    function ajax_openUser(id) {
+
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url: "admin/user/" + id,
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data) {
+                $("#details").empty();
+                $("#details").html(data);
+                $("#detail_modal").modal();
+            }
+        })
+    }
+
+    function show_mes(message,err) {
+        let $el = $("#msg");
+        $el.empty();
+        let $cl = "";
+        if (err === true){
+            $cl = $("<div class='alert alert-danger'></div>");
+        }else{
+            $cl = $("<div class='alert alert-info'></div>");
+        }
+
+        let $ml = $("<strong></strong>");
+        $ml.text(message);
+        $cl.append($ml);
+        $el.append($cl);
+    }
+
+
+    function ajax_is_username_unique(username){
+        let result = "";
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/api/admin/unique_u/" + username,
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                result=data['result'];
+            }
+        });
+        return result;
+    }
+
+    function ajax_is_email_unique(email){
+        let result = "";
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/api/admin/unique_e/" + email,
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                result=data['result'];
+            }
+        });
+        return result;
+    }
+
+    function verification(){
+        var valid = true;
+        const userName = $.trim($("#f_userName").val());
+        const password = $.trim($("#f_password").val());
+        const email =$.trim( $("#f_email").val());
+        const enable = $.trim($("#f_enable").val());
+        const orgName = $.trim($("#f_orgName").val());
+
+        if(userName === ""){
+            valid = false;
+            show_mes([[#{admin.alert.login.name.empty}]],true);
+            return valid;
+        }
+        if(password === ""){
+            valid = false;
+            show_mes([[#{admin.alert.password.empty}]],true);
+            return valid;
+        }
+        if(email === ""){
+            valid = false;
+            show_mes([[#{admin.alert.email.empty}]],true);
+            return valid;
+        }
+        if(enable === ""){
+            valid = false;
+            show_mes([[#{admin.alert.enable.empty}]],true);
+            return valid;
+        }
+        if(orgName === ""){
+            valid = false;
+            show_mes([[#{admin.alert.username.empty}]],true);
+            return valid;
+        }
+        return valid;
+    }
+
+    function verification_unique(){
+        var valid = true;
+        const userName = $.trim($("#f_userName").val());
+        const email =$.trim( $("#f_email").val());
+
+        if(ajax_is_email_unique(email)){
+            valid = false;
+            show_mes("Email is existing",true);
+            return valid;
+        }
+
+        if(ajax_is_username_unique(userName)){
+            valid = false;
+            show_mes("User name is existing",true);
+            return valid;
+        }
+        return valid;
+    }
+
+    function ajax_openDeptEmp(){
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url: "/admin/deptEmp",
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data) {
+                $("#dept_detail").empty();
+                $("#dept_detail").html(data);
+                $("#dept_modal").modal();
+            }
+        })
+    }
+</script>

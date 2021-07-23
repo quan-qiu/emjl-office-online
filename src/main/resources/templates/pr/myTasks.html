@@ -1,0 +1,87 @@
+<h4>My Tasks</h4>
+<div class="row" id="prd_msg"></div>
+<div th:switch="${myTasks!=null and !myTasks.empty}">
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-sm text-sm-center">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col" th:text="#{pr.task.assignee}"></th>
+                <th scope="col" th:text="#{pr.title}">PR title</th>
+                <th scope="col" th:text="#{admin.user.username}"></th>
+                <th scope="col" th:text="#{pr.apl.dept}"></th>
+            </tr>
+            </thead>
+            <tr th:each="task,iter:${myTasks}">
+                <td>
+                    <span th:text="${iter.index +1 }"></span>
+                </td>
+                <td>
+                    <span th:text="${task.taskName}"></span>
+                </td>
+                <td>
+                    <input type="text" th:value="${task.taskId}" id="task_id" hidden>
+                    <input type="text" th:value="${task.taskData.nextAssignee}" id="next_assignee" hidden>
+                    <input type="text" class="prmId" th:value="${task.taskData.mainId}" hidden>
+
+                    <a class="read_prm" href="" ><i class="fa fa-info-circle fa-lg mr-2" style="color: green"></i>[[${task.taskData.prTitle}]]
+                    </a>
+                </td>
+                <td><span th:text="${task.taskData.orgName}"></span></td>
+                <td><span th:text="${task.taskData.dept}"></span></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="row" th:case="false">
+        <h5 th:text="#{no.record}"></h5>
+    </div>
+</div>
+
+<div class="modal fade" id="read_prm_modal">
+    <div class="modal-dialog" style="max-width: 80%!important;">
+        <div class="modal-content">
+            <div class="modal-header d-block">
+                <h4 class="modal-title " th:text="#{pr.name}"></h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body" id="read_prm_details">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" th:text="#{page.close}"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+
+    $(document).ready(function () {
+        $(".read_prm").click(function (e){
+            e.preventDefault();
+            let prm_id = $(this).parent("td").find(".prmId").val();
+           // let task_id = $("#task_id").val();
+           // let next_assignee = $("#next_assignee").val();
+            ajax_readPrm(prm_id);
+        });
+
+        $(".modal").on('hidden.bs.modal', function () {
+            $("#my_tasks").trigger("click");
+        });
+    })
+    function ajax_readPrm(prm_id) {
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url: "/pr/prm/read/" + prm_id ,
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data) {
+                $("#read_prm_details").empty();
+                $("#read_prm_details").html(data);
+                $("#read_prm_modal").modal();
+            }
+        })
+    }
+</script>

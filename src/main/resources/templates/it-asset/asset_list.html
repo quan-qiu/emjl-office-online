@@ -1,0 +1,184 @@
+<div th:switch="${assets!=null and !assets.empty}">
+    <div class="row" th:case="true">
+
+        <table class="table table-striped table-bordered table-sm text-sm-center">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col"></th>
+                <th scope="col" th:text="#{it_asset.username}"></th>
+                <th scope="col" th:text="#{it_asset.dept}"></th>
+                <th scope="col" th:text="#{it_asset.asset_type}"></th>
+                <th scope="col" th:text="#{it_asset.it_type}"></th>
+                <th scope="col" th:text="#{it_asset.brand_model}"></th>
+                <th scope="col" th:text="#{it_asset.sn}"></th>
+                <th scope="col" th:text="#{it_asset.location}"></th>
+                <th scope="col" th:text="#{it_asset.purchase_date}"></th>
+                <th scope="col" th:text="#{it_asset.comment}"></th>
+                <th scope="col" th:text="#{it_asset.asset_id}"></th>
+                <th scope="col" th:text="#{it_asset.status}"></th>
+            </tr>
+            </thead>
+            <tr th:each="asset,iter:${assets}">
+                <td>
+                    <span th:text="${iter.index +1 }"></span>
+                </td>
+                <td>
+                    <span class='id' hidden th:text="${asset.id}"></span>
+                    <button sec:authorize="hasAuthority('ADMIN')" type='button' class='btn btn-link a_update'>
+                        <i class='fa fa-edit fa-lg' style='color: green '></i></button>
+                    <button sec:authorize="hasAuthority('ADMIN')" type='button' class='btn btn-link a_delete'>
+                        <i class='fa fa-trash-o fa-lg' style='color: red '></i></button>
+                </td>
+                <td>
+                    <samll th:text="${asset.userName}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${asset.dept}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${asset.assetType}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${asset.type}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${asset.brandModel}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${asset.sn}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${asset.location}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${#dates.format(asset.purchaseDate,'yyyy-MM-dd')}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${asset.comment}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${asset.assetId}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${asset.status}"></samll>
+                </td>
+            </tr>
+        </table>
+        <div th:if = "${totalPages > 1}">
+            <div class="row col-sm-10">
+                <div class="col-sm-2">
+                    <span class="badge badge-success" th:text="#{total.number}"></span>: [[${totalItems}]]
+                </div>
+                <div class="col-sm-1">
+                    <ul class="list-group list-group-horizontal">
+
+                        <li th:each="i:${#numbers.sequence(1,totalPages)}" class="list-group-item">
+                            <a th:if = "${currentPage!= i}" class="page-no" href="#" >
+                                [[${i}]]
+                            </a>
+                            <span th:unless = "${currentPage !=i}">[[${i}]]</span>
+                        </li>
+
+
+                        <li class="list-group-item page-next">
+                            <a th:if = "${currentPage != totalPages}" class="page-next" href="#">
+                                [[#{next.page}]]
+                            </a>
+                            <span th:unless = "${currentPage != totalPages}">[[#{next.page}]]</span>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" th:case="false">
+        <h5 th:text="#{no.record}"></h5>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    $(document).ready(function () {
+        $('.a_update').click(function (e) {
+            const id = $(this).parent("td").find(".id").text();
+
+            openAsset(id);
+        });
+
+        $('.a_delete').click(function (e) {
+            const id = $(this).parent("td").find(".id").text();
+            delAsset(id);
+        });
+
+        $('.page-no').click(function (e){
+            let no = $(this).text();
+            ajax_assetByPage(no,[[${name}]],[[${classify}]],[[${status}]])
+        })
+
+        $('.page-next').click(function (e){
+
+            let no = [[${currentPage + 1}]];
+            ajax_assetByPage(no,[[${name}]],[[${classify}]],[[${status}]])
+        })
+    })
+
+    function ajax_assetByPage(no, name, classify,status){
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url: "/it-asset/row/" + name+"/"+ classify + "/" +status + "/" +no,
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data) {
+                $el = $("#assets");
+                $el.empty();
+                $el.html(data);
+            }
+        })
+    }
+
+    function openAsset(id) {
+        $.ajax({
+            type: "GET",
+            contentType: "text/html",
+            url: "asset/" + id,
+            dataType: 'html',
+            cache: false,
+            async: false,
+            success: function (data) {
+                $("#newAssetContent").empty();
+                $("#newAssetContent").html(data);
+                $("#add_modal").modal();
+            }
+        })
+    }
+
+    function delAsset(id) {
+        $("#delete_modal").modal();
+
+        $("#delete_modal .modal-footer button").on("click", function (e) {
+            const $button = $(e.target);
+            if ($button.text() === "Yes") {
+                $.ajax({
+                    type: "DELETE",
+                    url: "/api/asset/delete/" + id,
+                    dataType: 'json',
+                    cache: false,
+                    async: false,
+                    success: (function (data) {
+                        $("#delete_modal").modal('hide');
+                        $("#search").trigger("click");
+                    }),
+                    error: (function (data) {
+
+                    })
+                })
+            }
+            ;
+
+        })
+
+    }
+</script>
