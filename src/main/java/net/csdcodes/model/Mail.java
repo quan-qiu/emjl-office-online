@@ -12,15 +12,16 @@ public class Mail {
     private String to;
     private String subject;
     private String content;
-    private Map model;
+    private Map<String, String> model;
 
     public Mail() {
     }
 
-    public Mail( String to, String subject, String content) {
+    public Mail( String to, String subject, String content,Map<String, String> model) {
         this.to = to;
         this.subject = subject;
         this.content = content;
+        this.model = model;
     }
 
     public String getFrom() {
@@ -55,11 +56,11 @@ public class Mail {
         this.content = content;
     }
 
-    public Map getModel() {
+    public Map<String, String> getModel() {
         return model;
     }
 
-    public void setModel(Map model) {
+    public void setModel(Map<String, String> model) {
         this.model = model;
     }
 
@@ -70,6 +71,7 @@ public class Mail {
                 ", to='" + to + '\'' +
                 ", subject='" + subject + '\'' +
                 ", content='" + content + '\'' +
+                ", model=" + model +
                 '}';
     }
 }

@@ -19,10 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 @Service
+@Transactional
 public class PrProcessService {
 
     @Autowired
@@ -33,6 +35,7 @@ public class PrProcessService {
     public static final String TASK_MANAGER_GROUP = "PR-MANAGER";
     public static final String TASK_DEPUTY_MANAGER_GROUP = "PR-DEPUTY-MANAGING-DIRECTOR";
     public static final String TASK_MANAGER_DIRECTOR_GROUP = "PR-MANAGING-DIRECTOR";
+    public static final String TASK_PURCHASER_GROUP = "PR-PURCHASER";
     public static final String TASK_FINISHED = "FINISHED";
     public static final String PROCESS_DEFINITION_KEY = "PR-Request";
     public static final String EMP_NAME = "empName";
@@ -165,9 +168,13 @@ public class PrProcessService {
         }
         if(role.equals(TASK_DEPUTY_MANAGER_GROUP)){
             runtimeService.setVariable(processId, "curtAssignee",TASK_MANAGER_DIRECTOR_GROUP);
-            runtimeService.setVariable(processId, "nextAssignee",TASK_FINISHED);
+            runtimeService.setVariable(processId, "nextAssignee",TASK_PURCHASER_GROUP);
         }
         if(role.equals(TASK_MANAGER_DIRECTOR_GROUP)){
+            runtimeService.setVariable(processId, "curtAssignee",TASK_PURCHASER_GROUP);
+            runtimeService.setVariable(processId, "nextAssignee",TASK_FINISHED);
+        }
+        if(role.equals(TASK_PURCHASER_GROUP)){
           runtimeService.setVariable(processId, "curtAssignee",TASK_FINISHED);
           runtimeService.setVariable(processId, "nextAssignee",TASK_FINISHED);
         }

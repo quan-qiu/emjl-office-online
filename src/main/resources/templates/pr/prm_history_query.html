@@ -6,6 +6,7 @@
                 <th scope="col">#</th>
                 <th scope="col" th:text="#{pr.title}"></th>
                 <th scope="col" th:text="#{pr.no}"></th>
+                <th scope="col" th:text="#{pr.prm.pocode}"></th>
                 <th scope="col" th:text="#{pr.flow_type_s}"></th>
                 <th scope="col" th:text="#{pr.cost_center}"></th>
                 <th scope="col" th:text="#{pr.apl.dept}"></th>
@@ -32,6 +33,9 @@
                     <samll th:text="${prm.prNo}"></samll>
                 </td>
                 <td>
+                    <samll th:text="${prm.poCode}"></samll>
+                </td>
+                <td>
                     <samll th:text="${prm.flowType}"></samll>
 
                 </td>
@@ -53,7 +57,7 @@
                         <b><i class="fa fa-flag fa-lg" style='color: green '></i></b>
                     </span>
                     <span th:if="${prm.finished==0 }">
-                        <b><i class="fa fa-flag fa-lg" style='color: blue '></i></b>
+                        <b><i class="fa fa-clock-o fa-lg" style='color: blue '></i></b>
                         <button class="btn btn-danger revoke" th:text="#{pr.prm.revoke}"></button>
                     </span>
                 </td>
@@ -70,7 +74,7 @@
                             </span>
                         </div>
                         <div th:case="0">
-                            <button class="btn btn-info btn-sm" th:text="#{pr.task.assignee}"></button>
+                            <button class="btn btn-info btn-sm task_assignee" th:text="#{pr.task.assignee}"></button>
                         </div>
                     </div>
                 </td>
@@ -126,6 +130,24 @@
     </div>
 </div>
 
+<div class="modal fade" id="assignee_modal" >
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header d-block">
+                <h4 class="modal-title " ></h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body" >
+                <div>Current assignee:</div>
+                <div id="assignee-msg"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" data-dismiss="modal" th:text="#{page.close}"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script th:inline="javascript">
     $(document).ready(function () {
         $('a.a_read').click(function (e) {
@@ -148,11 +170,15 @@
 
         });
 
-        $(".modal").on('hidden.bs.modal',function (){
+        $(".modal").not("#assignee_modal").on('hidden.bs.modal',function (){
             $("#saved_list").trigger("click");
             $("#display_pr_submitted").trigger("click");
         });
 
+        $(".task_assignee").click(function (){
+            const id = $(this).closest("tr").find(".prm_id").text();
+            ajax_getTaskName(id);
+        })
 
     });
 
@@ -204,14 +230,16 @@
             type: "GET",
             contentType: "text/html",
             url: "/api/pr/process/taskname/" + id,
-            dataType: 'html',
+            dataType: 'text',
             cache: false,
             async: false,
             success: function (data) {
 
-                $("#v_pr_item_details").empty();
-                $("#v_pr_item_details").html(data);
-                $("#v_pr_detail_modal").modal();
+                $("#assignee-msg").empty();
+                $("#assignee-msg").html("<div class='alert alert-success'>" +
+                    "<strong>"+ data + "</strong>"+
+                    '</div>');
+                $("#assignee_modal").modal();
             }
         })
     }

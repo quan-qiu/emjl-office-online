@@ -75,7 +75,7 @@
         <sequenceFlow sourceRef="managerDirectorApproveTask" targetRef="managerDirectorDecision"/>
 
         <exclusiveGateway id="managerDirectorDecision"/>
-        <sequenceFlow sourceRef="managerDirectorDecision" targetRef="prApproveTask">
+        <sequenceFlow sourceRef="managerDirectorDecision" targetRef="purchaserApproveTask">
             <conditionExpression xsi:type="tFormalExpression">
                 <![CDATA[
           ${approved}
@@ -83,6 +83,26 @@
             </conditionExpression>
         </sequenceFlow>
         <sequenceFlow sourceRef="managerDirectorDecision" targetRef="sendRejectionMail">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[
+          ${!approved}
+        ]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <userTask id="purchaserApproveTask" name="Purchaser approval" flowable:candidateGroups="PR-PURCHASER"
+                  flowable:class="net.csdcodes.handler.PrProcessApprovalHandler"/>
+        <sequenceFlow sourceRef="purchaserApproveTask" targetRef="purchaserDecision"/>
+
+        <exclusiveGateway id="purchaserDecision"/>
+        <sequenceFlow sourceRef="purchaserDecision" targetRef="prApproveTask">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[
+          ${approved}
+        ]]>
+            </conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow sourceRef="purchaserDecision" targetRef="sendRejectionMail">
             <conditionExpression xsi:type="tFormalExpression">
                 <![CDATA[
           ${!approved}

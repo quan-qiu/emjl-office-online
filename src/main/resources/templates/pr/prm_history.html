@@ -3,18 +3,25 @@
     <div class="container">
         <div class="row">
             <div class="col-sm form-group mx-2 my-2">
-                <label for="finished" th:text="#{pr.work.flow.completed}"></label>
-                <select class="form-control" id="finished" name="finished">
-                    <option value="1">true</option>
+                <!--<label for="finished" th:text="#{pr.work.flow.completed}"></label>-->
+                <select class="form-control" id="finished" name="finished" hidden>
+                    <option value="1" selected>true</option>
                     <option value="0">false</option>
+                </select>
+                <!--<label for="approved" th:text="#{pr.approved}"></label>-->
+                <select class="form-control" id="approved" name="approved" hidden>
+                    <option value="1" selected>true</option>
+                    <option value="0">false</option>
+                </select>
+                <label for="flowType" th:text="#{pr.flow_type_s}"></label>
+                <select class="form-control" id="flowType" name="flowType">
+                    <option value="">Select a flow type</option>
+                    <option th:each="type:${flow_type}" th:text="${type}"></option>
                 </select>
             </div>
             <div class="col-sm form-group mx-2 my-2">
-                <label for="approved" th:text="#{pr.approved}"></label>
-                <select class="form-control" id="approved" name="approved">
-                    <option value="1">true</option>
-                    <option value="0">false</option>
-                </select>
+                <label for="poCode" th:text="#{pr.prm.pocode}"></label>
+                <input class="form-control" type="text" id="poCode" name="poCode">
             </div>
             <div class="col-sm form-group mx-2 my-2">
                 <label for="pr_start" th:text="#{pr.apl.start.date}"></label>
@@ -38,7 +45,7 @@
         <div class="row mx-2">
             <div class="col-lg text-center">
                 <button class="btn btn-primary" th:text="#{page.submit}" id="submit"></button>
-                <a class="btn btn-info ml-3" th:href="@{/pr/prm/download/}" id="export-excel">Export to Excel</a>
+                <a class="btn btn-info ml-3" th:href="@{/pr/prm/download/}" id="export-excel">[[#{pr.export.excel}]]</a>
             </div>
         </div>
     </div>
@@ -85,8 +92,10 @@
             const agreed = $("#approved").val();
             const start = $.trim($("#prmStart").val())==="" ? "null" : $.trim($("#prmStart").val());
             const end = $.trim($("#prmEnd").val()) === "" ? "null" : $.trim($("#prmEnd").val());
+            const poCode = $.trim($("#poCode").val()) === "" ? "null" :$("#poCode").val();
+            const flowType = $.trim($("#flowType").val()) === "" ? "null" : $("#flowType").val();
 
-            let href = e.target.href + completed + "/" + agreed + "/" + start + "/" + end;
+            let href = e.target.href + completed + "/" + agreed + "/" + start + "/" + end + "/" + flowType + "/" + poCode;
 
             window.location = href;
         })
@@ -120,6 +129,8 @@
         const approved = $("#approved").val();
         const prmStart = $.trim($("#prmStart").val()) === "" ? "n" : $.trim($("#prmStart").val());
         const prmEnd = $.trim($("#prmEnd").val()) === "" ? "n" : $.trim($("#prmEnd").val());
+        const poCode = $.trim($("#poCode").val()) === "" ? "null" :$("#poCode").val();
+        const flowType = $.trim($("#flowType").val()) === "" ? "null" : $("#flowType").val();
 /*        const json_formData = $('#f_request_v').serializeArray()
             .reduce(function (a, x) {
                 a[x.name] = x.value;
@@ -128,7 +139,7 @@
         $.ajax({
             type: "GET",
             contentType: "application/json",
-            url: "/pr/prm/download/" + completed + "/" + approved + "/" + prmStart + "/"+ prmEnd ,
+            url: "/pr/prm/download/" + completed + "/" + approved + "/" + prmStart + "/"+ prmEnd + "/" + flowType + "/" + poCode,
             dataType: "application/octet-stream",
             cache: false,
             async: false,

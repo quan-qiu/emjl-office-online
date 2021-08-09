@@ -17,6 +17,9 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -49,7 +52,7 @@ public class AsyncMailService {
         SimpleMailMessage mail=new SimpleMailMessage();
         mail.setFrom(inMail.getFrom());
         mail.setTo(inMail.getTo());
-        mail.setSubject(inMail.getSubject());
+        mail.setSubject(inMail.getSubject()+" (Do Not Reply To This Email)");
         mail.setText("This an alert email from service : "+inMail.getContent());
         quickService.submit(new Runnable() {
             @Override
@@ -72,14 +75,14 @@ public class AsyncMailService {
                 StandardCharsets.UTF_8.name());
 
         Context context = new Context();
-        context.setVariables(mail.getModel());
-
+        Map<String, String> vars= (Map<String, String>)mail.getModel();
+        context.setVariables(Collections.<String, Object>unmodifiableMap(vars));
 
         String html = templateEngine.process("email/pr_alert_email", context);
 
         helper.setFrom(mail.getFrom());
         helper.setTo(mail.getTo());
-        helper.setSubject(mail.getSubject());
+        helper.setSubject(mail.getSubject()+" (Do Not Reply To This Email)");
         helper.setText(html,true);
         quickService.submit(new Runnable() {
             @Override

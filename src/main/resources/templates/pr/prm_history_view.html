@@ -1,8 +1,22 @@
-<div class="card-header">
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>EUROMISI Office Online</title>
+    <div th:replace="fragments/fragments::html_header('tag')"></div>
+    <script type="text/javascript" th:src="@{/js/utility.js}"></script>
+    <style type="text/css" media="print">
+        body {visibility:hidden;}
+        .print {visibility:visible;}
+    </style>
+</head>
+<body>
+
+<div class="card-header print">
     <h5 th:text="#{pr.name}"></h5>
+    <button id="printer" onclick="window.print();return false;"><i class="fa fa-print fa-lg" style='color: red '></i></button>
 </div>
 
-<div class="card mx-2 my-2" th:switch="${prms!=null and !prms.empty}">
+<div class="card mx-2 my-2 print" th:switch="${prms!=null and !prms.empty}">
     <table class="table border-0">
         <tr>
             <td class="text-left">
@@ -17,12 +31,13 @@
                 <strong><label th:text="#{pr.flow_type_s} + ':'"></label></strong>
                 <h6 th:text="${prm.flowType}"></h6>
             </td>
-        </tr>
-        <tr>
+
             <td class="text-left">
                 <strong><label th:text="#{pr.apl.username} + ':'"></label></strong>
                 <h6 th:text="${prm.aplUserName}"></h6>
             </td>
+        </tr>
+        <tr>
             <td class="text-left">
                 <strong><label th:text="#{pr.cost_center} + ':'"></label></strong>
                 <h6 th:text="${prm.costCenter}"/>
@@ -31,8 +46,7 @@
                 <strong><label th:text="#{pr.apl.dept} + ':'"></label></strong>
                 <h6 th:text="${prm.aplDept}"/>
             </td>
-        </tr>
-        <tr>
+
             <td class="text-left">
                 <strong><label th:text="#{pr.project.name} + ':'"></label></strong>
                 <h6 th:text="${prm.projectName}"/>
@@ -47,6 +61,8 @@
                         <b><i class="fa fa-times fa-lg" style='color: red '></i></b>
                     </span>
             </td>
+        </tr>
+        <tr>
             <td class="text-left">
                 <strong><label th:text="#{pr.approve.agreed} + ':'"></label></strong>
                 <h6 th:text="${prm.approved==1}? #{pr.approve.agreed}:#{pr.approve.rejected}"/>
@@ -57,8 +73,10 @@
                         <b><i class="fa fa-times fa-lg" style='color: red '></i></b>
                     </span>
             </td>
-        </tr>
-        <tr>
+            <td>
+                <strong><label th:text="#{pr.prm.pocode} + ':'"></label></strong>
+                <h6 th:text="${prm.poCode}"/>
+            </td>
             <td>
                 <strong><label th:text="#{pr.apl.creation.date} + ':'"></label></strong>
                 <h6 th:text="${#dates.format(prm.prAplDate,'yyyy-MM-dd')}"/>
@@ -71,7 +89,7 @@
     </table>
 </div>
 
-<div class="card mx-2 my-2" th:switch="${prds!=null and !prds.empty}">
+<div class="card mx-2 my-2 print" th:switch="${prds!=null and !prds.empty}">
     <div class="card-header">
         <h5 th:text="#{pr.details.detail}"></h5>
     </div>
@@ -83,8 +101,9 @@
                 <th scope="col" th:text="#{pr.details.erp.code}"></th>
                 <th scope="col" th:text="#{pr.details.erp.desc}"></th>
                 <th scope="col" th:text="#{pr.details.erp.brand_size}"></th>
-                <th scope="col" th:text="#{pr.details.qty}"></th>
                 <th scope="col" th:text="#{pr.details.erp.unit}"></th>
+                <th scope="col" th:text="#{pr.details.qty}"></th>
+                <th scope="col" th:text="#{pr.details.unit.cost}"></th>
                 <th scope="col" th:text="#{pr.details.est.cost}"></th>
                 <th scope="col" th:text="#{pr.details.target.date}"></th>
             </tr>
@@ -102,14 +121,18 @@
                 <td>
                     <samll th:text="${prd.itemErpBrandSize}"></samll>
                 </td>
-                <td>
-                    <samll th:text="${prd.Qty}"></samll>
-                </td>
+
                 <td>
                     <samll th:text="${prd.itemErpUnit}"></samll>
                 </td>
                 <td>
+                    <samll th:text="${prd.qty}"></samll>
+                </td>
+                <td>
                     <samll th:text="${prd.estCost}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.totalEstCost}"></samll>
                 </td>
                 <td>
                     <samll th:text="${#dates.format(prd.targetDate,'yyyy-MM-dd')}"></samll>
@@ -123,7 +146,7 @@
 </div>
 
 
-<div class="card mx-2 my-2" th:switch="${prcs!=null and !prcs.empty}">
+<div class="card mx-2 my-2 print" th:switch="${prcs!=null and !prcs.empty}">
     <div class="card-header">
         <h5 th:text="#{pr.approve.comment}"></h5>
     </div>
@@ -135,4 +158,5 @@
     </ul>
 </div>
 
-
+</body>
+</html>

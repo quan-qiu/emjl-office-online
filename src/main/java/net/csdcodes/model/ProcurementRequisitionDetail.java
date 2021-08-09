@@ -40,6 +40,7 @@ public class ProcurementRequisitionDetail {
     @Column(name="target_date")
     protected Date targetDate;
 
+    protected float totalEstCost;
 
     public int getId() {
         return id;
@@ -129,6 +130,14 @@ public class ProcurementRequisitionDetail {
         this.targetDate = targetDate;
     }
 
+    public float getTotalEstCost() {
+        return totalEstCost;
+    }
+
+    public void setTotalEstCost(float totalEstCost) {
+        this.totalEstCost = totalEstCost;
+    }
+
     @Override
     public String toString() {
         return "ProcurementRequisitionDetail{" +
@@ -143,6 +152,7 @@ public class ProcurementRequisitionDetail {
                 ", createdDate=" + createdDate +
                 ", updatedDate=" + updatedDate +
                 ", targetDate=" + targetDate +
+                ", totalEstCost=" + totalEstCost +
                 '}';
     }
 }

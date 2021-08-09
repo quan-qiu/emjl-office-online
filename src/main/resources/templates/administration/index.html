@@ -6,9 +6,11 @@
 </head>
 <body>
 <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" th:href="@{/}" th:text="#{company.emjl}">
+    <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" th:href="@{/}">
+        <i class="fa fa-home fa-lg" style="color: white" aria-hidden="true"></i>
     </a>
-    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse" data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse"
+            data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div th:if="${isDev}" class="alert-warning">
@@ -30,57 +32,121 @@
         <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
             <div class="sidebar-sticky pt-3">
                 <ul class="nav flex-column" sec:authorize="hasAuthority('ADMIN')">
-                    <li class="nav-item" >
-                        <a class="nav-link active" href="#" id="user_manage">
-                            <h6 th:text="#{admin.user_management}"></h6>
-                            <span class="sr-only">(current)</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" >
-                        <a class="nav-link" href="#" id="role_manage">
-                            <h6 th:text="#{admin.role_management}"></h6>
-                        </a>
-                    </li>
-                    <li class="nav-item" >
-                        <a class="nav-link" href="#" id="authen_manage">
-                            <h6 th:text="#{admin.authentication}"></h6>
-                        </a>
+                    <li class="nav-item">
+                        <div class="row">
+                            <div class="col-sm-auto pr-0">
+                                <i class="fa fa-users" style="color: blue" aria-hidden="true"></i>
+                            </div>
+                            <div class="col-sm pl-0">
+                                <a class="nav-link active pt-0" href="#" id="user_manage">
+                                    <h6 th:text="#{admin.user_management}"></h6>
+                                    <span class="sr-only">(current)</span>
+                                </a>
+                            </div>
+                        </div>
+
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" id="it_classifior_manage">
-                            <h6 th:text="#{admin.it_classification}"></h6>
-                        </a>
+                        <div class="row">
+                            <div class="col-sm-auto pr-0">
+                                <i class="fa fa-tags" style="color: blue" aria-hidden="true"></i>
+                            </div>
+                            <div class="col-sm pl-0">
+                                <a class="nav-link pt-0" href="#" id="role_manage">
+                                    <h6 th:text="#{admin.role_management}"></h6>
+                                </a>
+                            </div>
+
+                        </div>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" id="it_status_manage">
-                            <h6 th:text="#{admin.it_status}"></h6>
-                        </a>
+                        <div class="row">
+                            <div class="col-sm-auto pr-0">
+                                <i class="fa fa-lock" style="color: blue" aria-hidden="true"></i>
+                            </div>
+                            <div class="col-sm pl-0">
+                                <a class="nav-link pt-0" href="#" id="authen_manage">
+                                    <h6 th:text="#{admin.authentication}"></h6>
+                                </a>
+                            </div>
+                        </div>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" id="ip_address_manage">
-                            <h6 th:text="#{admin.ip_address_server}"></h6>
-                        </a>
+                        <div class="row">
+                            <div class="col-sm-auto pr-0">
+                                <i class="fa fa-desktop" style="color: blue" aria-hidden="true"></i>
+                            </div>
+                            <div class="col-sm pl-0">
+                                <a class="nav-link pt-0" href="#" id="it_classifior_manage">
+                                    <h6 th:text="#{admin.it_classification}"></h6>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <div class="row">
+                            <div class="col-sm-auto pr-0">
+                                <i class="fa fa-info" style="color: blue" aria-hidden="true"></i>
+                            </div>
+                            <div class="col-sm pl-0">
+                                <a class="nav-link pt-0" href="#" id="it_status_manage">
+                                    <h6 th:text="#{admin.it_status}"></h6>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <div class="row">
+                            <div class="col-sm-auto pr-0">
+                                <i class="fa fa-sitemap" style="color: blue" aria-hidden="true"></i>
+                            </div>
+                            <div class="col-sm pl-0">
+                                <a class="nav-link pt-0" href="#" id="ip_address_manage">
+                                    <h6 th:text="#{admin.ip_address_server}"></h6>
+                                </a>
+                            </div>
+                        </div>
                     </li>
                 </ul>
                 <ul class="nav flex-column" sec:authorize="hasAnyAuthority('HR-ADMIN','ADMIN')">
                     <li class="nav-item">
-                        <a class="nav-link" href="#" id="calendar_manage">
-                            <h6 th:text="#{calendar.calendar_editor}"></h6>
-                        </a>
+                        <div class="row">
+                            <div class="col-sm-auto pr-0">
+                                <i class="fa fa-calendar" style="color: blue" aria-hidden="true"></i>
+                            </div>
+                            <div class="col-sm pl-0">
+                                <a class="nav-link pt-0" href="#" id="calendar_manage">
+                                    <h6 th:text="#{calendar.calendar_editor}"></h6>
+                                </a>
+                            </div>
+                        </div>
                     </li>
                 </ul>
                 <ul class="nav flex-column mb-2" sec:authorize="isAuthenticated()">
                     <li class="nav-item">
-                        <a class="nav-link" href="#" id="change_password">
-                            <h6 th:text="#{admin.user.change.password}"></h6>
-                        </a>
+                        <div class="row">
+                            <div class="col-sm-auto pr-0">
+                                <i class="fa fa-key" style="color: blue" aria-hidden="true"></i>
+                            </div>
+                            <div class="col-sm pl-0">
+                                <a class="nav-link pt-0" href="#" id="change_password">
+                                    <h6 th:text="#{admin.user.change.password}"></h6>
+                                </a>
+                            </div>
+                        </div>
                     </li>
                 </ul>
                 <ul class="nav flex-column mb-2" sec:authorize="isAuthenticated()">
                     <li class="nav-item">
-                        <a class="nav-link" href="#" id="p_it_asset">
-                            <h6 th:text="#{index.IT_asset}"></h6>
-                        </a>
+                        <div class="row">
+                            <div class="col-sm-auto pr-0">
+                                <i class="fa fa-keyboard-o" style="color: blue" aria-hidden="true"></i>
+                            </div>
+                            <div class="col-sm pl-0">
+                                <a class="nav-link pt-0" href="#" id="p_it_asset">
+                                    <h6 th:text="#{index.IT_asset}"></h6>
+                                </a></div>
+                        </div>
                     </li>
                 </ul>
             </div>
@@ -94,38 +160,38 @@
 <div th:replace="fragments/fragments::html_js('tag')"></div>
 <script th:inline="javascript">
     $(document).ready(function () {
-        $('#user_manage').click(function (){
+        $('#user_manage').click(function () {
             ajax_listUser();
         });
 
-        $('#role_manage').click(function (){
+        $('#role_manage').click(function () {
             ajax_listRole();
         })
-        $('#it_classifior_manage').click(function (){
+        $('#it_classifior_manage').click(function () {
             ajax_listClassifior();
         })
-        $('#it_status_manage').click(function (){
+        $('#it_status_manage').click(function () {
             ajax_listStatus();
         })
-        $('#authen_manage').click(function (){
+        $('#authen_manage').click(function () {
             ajax_listAuthentications();
         })
-        $('#ip_address_manage').click(function (){
+        $('#ip_address_manage').click(function () {
             ajax_listIpAddresses();
         })
-        $('#calendar_manage').click(function (){
+        $('#calendar_manage').click(function () {
             ajax_listCalendar();
         })
-        $('#change_password').click(function (){
+        $('#change_password').click(function () {
             ajax_updatePassword();
         })
-        $('#p_it_asset').click(function (){
+        $('#p_it_asset').click(function () {
             ajax_p_it_asset();
         })
 
     })
 
-    function ajax_listUser(){
+    function ajax_listUser() {
         $.ajax({
             type: "GET",
             contentType: "text/html",
@@ -141,7 +207,7 @@
         });
     }
 
-    function ajax_listRole(){
+    function ajax_listRole() {
         $.ajax({
             type: "GET",
             contentType: "text/html",
@@ -157,7 +223,7 @@
         });
     }
 
-    function ajax_listClassifior(){
+    function ajax_listClassifior() {
         $.ajax({
             type: "GET",
             contentType: "text/html",
@@ -173,7 +239,7 @@
         });
     }
 
-    function ajax_listClassifior(){
+    function ajax_listClassifior() {
         $.ajax({
             type: "GET",
             contentType: "text/html",
@@ -189,7 +255,7 @@
         });
     }
 
-    function ajax_listStatus(){
+    function ajax_listStatus() {
         $.ajax({
             type: "GET",
             contentType: "text/html",
@@ -205,7 +271,7 @@
         });
     }
 
-    function ajax_listAuthentications(){
+    function ajax_listAuthentications() {
         $.ajax({
             type: "GET",
             contentType: "text/html",
@@ -221,7 +287,7 @@
         });
     }
 
-    function ajax_listIpAddresses(){
+    function ajax_listIpAddresses() {
         $.ajax({
             type: "GET",
             contentType: "text/html",
@@ -237,7 +303,7 @@
         });
     }
 
-    function ajax_listCalendar(){
+    function ajax_listCalendar() {
         $.ajax({
             type: "GET",
             contentType: "text/html",
@@ -253,7 +319,7 @@
         });
     }
 
-    function ajax_updatePassword(){
+    function ajax_updatePassword() {
         $.ajax({
             type: "GET",
             contentType: "text/html",
@@ -269,7 +335,7 @@
         });
     }
 
-    function ajax_p_it_asset(){
+    function ajax_p_it_asset() {
         $.ajax({
             type: "GET",
             contentType: "text/html",

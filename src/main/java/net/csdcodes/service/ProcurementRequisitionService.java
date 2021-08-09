@@ -32,7 +32,7 @@ public class ProcurementRequisitionService {
     public List<ProcurementRequisitionMain> getPRMainSavedList(String user_ssn) {
 
         String sql = "select prm.*, isnull(prd1.totalEstCost,0) totalEstCost from [dbo].[pr_main] prm left join" +
-                " (select sum(prd.est_cost) totalEstCost,prd.pr_main_id from [dbo].[pr_detail] prd" +
+                " (select sum(prd.qty * prd.est_cost) totalEstCost,prd.pr_main_id from [dbo].[pr_detail] prd" +
                 " group by prd.pr_main_id) prd1" +
                 " on prm.id = prd1.pr_main_id" +
                 " where prm.apl_user_ssn=? " +
@@ -49,7 +49,7 @@ public class ProcurementRequisitionService {
 
     public ProcurementRequisitionMain getPRMainById(int id) {
         String sql = "SELECT prm.*,isnull(prd1.totalEstCost,0) totalEstCost from [dbo].[pr_main] prm left join " +
-                " (select sum(prd.est_cost) totalEstCost,prd.pr_main_id from [dbo].[pr_detail] prd " +
+                " (select sum(prd.qty * prd.est_cost) totalEstCost,prd.pr_main_id from [dbo].[pr_detail] prd " +
                 " group by prd.pr_main_id) prd1 " +
                 " on prm.id = prd1.pr_main_id WHERE prm.id = ?";
 
@@ -130,7 +130,7 @@ public class ProcurementRequisitionService {
     }
 
     public List<ProcurementRequisitionDetail> getPRDetailsByPRMId(int prmId) {
-        String sql = "select * from [dbo].[pr_detail] " +
+        String sql = "select *,([qty] * [est_cost]) totalEstCost from [dbo].[pr_detail] " +
                 "where pr_main_id=? ";
 
         List<ProcurementRequisitionDetail> prds = jdbcTemplate.query(sql,
@@ -141,7 +141,7 @@ public class ProcurementRequisitionService {
     }
 
     public ProcurementRequisitionDetail getPRDetailsByPRDId(int prdId) {
-        String sql = "select * from [dbo].[pr_detail] " +
+        String sql = "select *,([qty] * [est_cost]) totalEstCost from [dbo].[pr_detail] " +
                 "where id=? ";
 
 
@@ -252,7 +252,7 @@ public class ProcurementRequisitionService {
     }
 
     public List<User> getUserByRole(String role){
-        String sql = "select u.[user_id],u.[username],u.[ssn] from [user] u " +
+        String sql = "select u.[user_id],u.[username],u.[orgname],u.[ssn] from [user] u " +
                 "left join [user_role] ur on u.user_id=ur.user_id " +
                 "where ur.role_id in (select role_id from [role] " +
                 "where role.name=?)";
@@ -355,61 +355,81 @@ public class ProcurementRequisitionService {
 
 
     public List<ProcurementRequisitionMain> getPRMHistory(PRMRequestVariables prmrv){
+
+        //System.out.println(prmrv.toString());
+
         String pattern = "yyyy-MM-dd";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
         String  sql = "SELECT TOP 1000 prm.*, isnull(prd1.totalEstCost,0) totalEstCost " +
                 " FROM [dbo].[pr_main] prm, " +
-                " (select sum(prd.est_cost) totalEstCost,prd.pr_main_id from [dbo].[pr_detail] prd" +
+                " (select sum(prd.qty * prd.est_cost) totalEstCost,prd.pr_main_id from [dbo].[pr_detail] prd" +
                 " group by prd.pr_main_id) prd1 " +
-                " where prm.id = prd1.pr_main_id and prm.finished=? and prm.approved=? and prm.submitted=1";
+                " where prm.id = prd1.pr_main_id and prm.finished=1 and prm.approved=1 and prm.submitted=1" +
+                " and prm.po_code like ? and prm.flow_type like ?";
+
+
+        if ((prmrv.getPrmStart()==null) && (prmrv.getPrmEnd()==null) ){
+            sql = sql + " order by prm.pr_apl_date desc";
+            //System.out.println(sql);
+            List<ProcurementRequisitionMain> prms = jdbcTemplate.query(sql,
+                    new Object[]{
+                            //prmrv.getFinished(),prmrv.getApproved(),
+                            (prmrv.getPoCode()==null? "%%" : "%" + prmrv.getPoCode() + "%"),
+                            (prmrv.getFlowType()==null? "%%" : prmrv.getFlowType())
+                    }, BeanPropertyRowMapper.newInstance(ProcurementRequisitionMain.class));
+            //System.out.println(prms.size());
+            return prms;
+        }
 
         if (!(prmrv.getPrmStart()==null) && !(prmrv.getPrmEnd()==null) ){
             sql = sql + " and pr_apl_date between ? and ? order by prm.pr_apl_date desc";
-
+            //System.out.println(sql);
             List<ProcurementRequisitionMain> prms = jdbcTemplate.query(sql,
-                    new Object[]{prmrv.getFinished(),prmrv.getApproved(),
+                    new Object[]{
+                            //prmrv.getFinished(),prmrv.getApproved(),
+                            (prmrv.getPoCode()==null? "%%" : "%" + prmrv.getPoCode() + "%"),
+                            (prmrv.getFlowType()==null? "%%" : prmrv.getFlowType()),
                             simpleDateFormat.format(prmrv.getPrmStart()),simpleDateFormat.format(prmrv.getPrmEnd())
                     }, BeanPropertyRowMapper.newInstance(ProcurementRequisitionMain.class));
-            System.out.println(prms.size());
+            //System.out.println(prms.size());
             return prms;
         }
-        if ((prmrv.getPrmStart()==null) && (prmrv.getPrmEnd()==null) ){
-            sql = sql + " order by prm.pr_apl_date desc";
-            System.out.println(sql);
-            List<ProcurementRequisitionMain> prms = jdbcTemplate.query(sql,
-                    new Object[]{prmrv.getFinished(),prmrv.getApproved()
-            }, BeanPropertyRowMapper.newInstance(ProcurementRequisitionMain.class));
-            System.out.println(prms.size());
-            return prms;
-        }
+
         if (!(prmrv.getPrmStart()==null) && (prmrv.getPrmEnd()==null) ){
             sql = sql + " and pr_apl_date >= ? order by prm.pr_apl_date desc";
-
+            //System.out.println(sql);
             List<ProcurementRequisitionMain> prms = jdbcTemplate.query(sql,
-                    new Object[]{prmrv.getFinished(),prmrv.getApproved(),
+                    new Object[]{
+                            //prmrv.getFinished(),prmrv.getApproved(),
+                            (prmrv.getPoCode()==null? "%%" : "%" + prmrv.getPoCode() + "%"),
+                            (prmrv.getFlowType()==null? "%%" : prmrv.getFlowType()),
                             simpleDateFormat.format(prmrv.getPrmStart())
                     }, BeanPropertyRowMapper.newInstance(ProcurementRequisitionMain.class));
-            System.out.println(prms.size());
+            //System.out.println(prms.size());
             return prms;
         }
         if ((prmrv.getPrmStart()==null) && !(prmrv.getPrmEnd()==null) ){
             sql = sql + " and pr_apl_date <= ? order by prm.pr_apl_date desc";
-
+            //System.out.println(sql);
             List<ProcurementRequisitionMain> prms = jdbcTemplate.query(sql,
-                    new Object[]{prmrv.getFinished(),prmrv.getApproved(),
+                    new Object[]{
+                            //prmrv.getFinished(),prmrv.getApproved(),
+                            (prmrv.getPoCode()==null? "%%" : "%" + prmrv.getPoCode() + "%"),
+                            (prmrv.getFlowType()==null? "%%" : prmrv.getFlowType()),
                             simpleDateFormat.format(prmrv.getPrmEnd())
                     }, BeanPropertyRowMapper.newInstance(ProcurementRequisitionMain.class));
-            System.out.println(prms.size());
+            //System.out.println(prms.size());
             return prms;
         }
+
         return null;
     }
 
     public List<ProcurementRequisitionMain> PRMSubmittedByUser(String userSsn){
         String  sql = "SELECT TOP 1000 prm.*,isnull(prd1.totalEstCost,0) totalEstCost" +
                 " FROM [dbo].[pr_main] prm left join" +
-                " (select sum(prd.est_cost) totalEstCost,prd.pr_main_id from [dbo].[pr_detail] prd " +
+                " (select sum(prd.qty * prd.est_cost) totalEstCost,prd.pr_main_id from [dbo].[pr_detail] prd " +
                 " group by prd.pr_main_id) prd1 " +
                 " on prm.id = prd1.pr_main_id where prm.apl_user_ssn=? and prm.submitted=1" +
                 " order by prm.pr_apl_date desc";
@@ -421,7 +441,7 @@ public class ProcurementRequisitionService {
     }
 
     public float getTotalCostByPrmId(int prmId){
-        String sql = "select sum([est_cost]) as estCost from [dbo].[pr_detail]" +
+        String sql = "select sum([qty] * [est_cost]) as totalEstCost from [dbo].[pr_detail]" +
                 " where pr_main_id=?" +
                 " group by pr_main_id;";
         try{
@@ -443,9 +463,9 @@ public class ProcurementRequisitionService {
         return ccs;
     }
 
-    public List<CostType> getCostType(){
-        String sql = "select * from [dbo].[cost_type]";
-        List cts = jdbcTemplate.query(sql,
+    public List<CostType> getCostType(String costcenter){
+        String sql = "select * from [dbo].[cost_type] where costcenter=?";
+        List cts = jdbcTemplate.query(sql,new Object[]{costcenter},
                 BeanPropertyRowMapper.newInstance(CostType.class));
         return cts;
     }
@@ -455,5 +475,19 @@ public class ProcurementRequisitionService {
         List pps = jdbcTemplate.query(sql,
                 BeanPropertyRowMapper.newInstance(PrProject.class));
         return pps;
+    }
+
+    public int fillPoCodeByPrmId( String poCode, int prmId){
+        LocalDateTime now = LocalDateTime.now();
+        String pattern = "yyyy-MM-dd";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        int result = jdbcTemplate.update("UPDATE [dbo].[pr_main] set" +
+                        " po_code=? , pr_apl_update_date=?" +
+                        " where id=?",
+                new Object[]{poCode,
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.SIMPLIFIED_CHINESE).format(now),
+                        prmId});
+
+        return result;
     }
 }

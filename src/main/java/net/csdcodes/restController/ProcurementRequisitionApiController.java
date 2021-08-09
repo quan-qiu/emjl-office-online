@@ -23,6 +23,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/pr")
@@ -39,6 +40,7 @@ public class ProcurementRequisitionApiController {
     PrProcessService prProcessService;
 
     protected static final String TASK_MANAGER_DIRECTOR_GROUP = "PR-MANAGING-DIRECTOR";
+    protected static final String TASK_PURCHASER_GROUP = "PR-PURCHASER";
 
     @PostMapping(value="/prm/add/flow_type", produces = {MimeTypeUtils.APPLICATION_JSON_VALUE})
     public String addFlowType(@RequestBody String flowType) {
@@ -171,7 +173,7 @@ public class ProcurementRequisitionApiController {
             prs.updatePrmFinishedStatus(1,prmId);
         }
         //if reaches the end node, set the workflow finished
-        if (role.equals(TASK_MANAGER_DIRECTOR_GROUP)){
+        if (role.equals(TASK_PURCHASER_GROUP)){
             prs.updatePrmFinishedStatus(1,prmId);
         }
 
@@ -189,5 +191,18 @@ public class ProcurementRequisitionApiController {
 
         System.out.println("resultDelete : " + resultDelete);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/costtype/{costcenter}")
+    public ResponseEntity<?> getCostType(@PathVariable String costcenter){
+        List costTypes = prs.getCostType(costcenter);
+
+        return new ResponseEntity<List<CostType>>(costTypes,HttpStatus.OK);
+    }
+
+    @PostMapping("/pocode/{prmId}/{poCode}")
+    public ResponseEntity fillPoCodeByPrmId(@PathVariable String poCode, @PathVariable int prmId){
+        int result = prs.fillPoCodeByPrmId(poCode,prmId);
+        return new ResponseEntity(result,HttpStatus.OK);
     }
 }

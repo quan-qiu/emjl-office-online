@@ -7,6 +7,7 @@ import net.csdcodes.model.User;
 import net.csdcodes.service.AsyncMailService;
 import net.csdcodes.service.EmailService;
 import net.csdcodes.service.UserService;
+import net.csdcodes.util.RequestURLUtil;
 import org.apache.tomcat.util.http.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,8 @@ public class EmailApiController {
     @Autowired
     private AsyncMailService asyncMailService;
 
+    private final static String PR_RECEIVER = "PR-RECEIVER";
+
     Logger logger = LoggerFactory.getLogger(EmailApiController.class);
 
     @PostMapping(value="/send/mail/{prTitle}",produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -76,35 +79,66 @@ public class EmailApiController {
         logger.debug("inside sendAsynchronousMail api");
         String to = mail.getTo();
 
-        String url = request.getRequestURL().toString();
+        /*String url = request.getRequestURL().toString();
         int first = url.indexOf("/");
         int second = url.indexOf("/",first + 1);
-        int third = url.indexOf("/", second + 1);
+        int third = url.indexOf("/", second + 1);*/
+        String urlRoot = RequestURLUtil.getSiteURL(request);
 
         if (to.startsWith("PR")){
             List<User> users = userService.getUserByRole(mail.getTo());
             Iterator<User> iterUsers = users.iterator();
             while (iterUsers.hasNext()){
                 mail.setTo(iterUsers.next().getEmail());
-                doSendMail(prTitle,mail, url.substring(0,third),prmId);
+                //doSendMail(prTitle,mail, url.substring(0,third),prmId);
+                doSendMail(prTitle,mail, urlRoot + "/pr/prm/read/" + prmId, to);
+            }
+            if(to.equals("PR-PURCHASER")){
+                System.out.println("-----send to receiver");
+                String content = "Dear receiver, here is a link to PR.";
+                ccMail(content, PR_RECEIVER, prTitle,mail, urlRoot+ "/pr/prm/history/" + prmId);
+
+                /*List<User> receivers = userService.getUserByRole("PR-RECEIVER");
+                Iterator<User> iterReceivers = receivers.iterator();
+                while (iterReceivers.hasNext()){
+                    mail.setTo(iterReceivers.next().getEmail());
+                    mail.setContent("Dear receiver, here is a link to PR.");
+                    System.out.println(mail.toString());
+                    //doSendMail(prTitle,mail, url.substring(0,third),prmId);
+                    doSendMail(prTitle,mail, url,prmId, "PR-RECEIVER");
+                }*/
             }
         }else{
             User toUser = userService.getUserBySsn(mail.getTo());
             System.out.println(toUser.toString());
             mail.setTo(toUser.getEmail());
-            doSendMail(prTitle,mail, url.substring(0,third),prmId);
+            //doSendMail(prTitle,mail, url.substring(0,third),prmId);
+            doSendMail(prTitle,mail, urlRoot + "/pr/prm/read/" + prmId, to);
         }
 
     }
 
-    private void doSendMail(String prTitle, Mail mail,String path, String prmId){
+    private void ccMail(String content, String mailGroup, String prTitle,Mail mail, String url){
+        List<User> receivers = userService.getUserByRole(mailGroup);
+        Iterator<User> iterReceivers = receivers.iterator();
+        while (iterReceivers.hasNext()){
+            mail.setTo(iterReceivers.next().getEmail());
+            mail.setContent(content);
+            System.out.println(mail.toString());
+            //doSendMail(prTitle,mail, url.substring(0,third),prmId);
+            doSendMail(prTitle,mail, url, PR_RECEIVER);
+        }
+    }
+
+    private void doSendMail(String prTitle, Mail mail,String path, String to){
         try{
             mail.setSubject("Notification from PR process administrator");
-            Map model = new HashMap();
+            Map<String, String> model = new HashMap<String, String>();
             model.put("prTitle", prTitle);
             model.put("mailContent", mail.getContent());
             model.put("conPath",path);
-            model.put("prmId", prmId);
+            //model.put("prmId", prmId);
+            model.put("to", to);
 
             mail.setModel(model);
 

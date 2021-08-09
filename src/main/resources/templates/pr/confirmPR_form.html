@@ -7,7 +7,7 @@
             <option value="">Select a manager</option>
             <option th:each="user : ${roleList}"
                     th:value="${user.ssn}"
-                    th:text="${user.userName}">
+                    th:text="${user.orgName}">
             </option>
         </select>
         <button class="btn btn-danger my-2" th:text="#{pr.submit.flow}" id="submit_flow"></button>
@@ -62,7 +62,7 @@
 
 
     function ajax_createPrRequest(variables){
-
+        $("#submit_flow").prop("disabled",true);
         $.ajax({
             type: "POST",
             contentType: "application/json",

@@ -12,8 +12,10 @@ public class PRMRequestVariables {
     private int submitted;
     private Date prmStart;
     private Date prmEnd;
+    private String poCode;
+    private String flowType;
 
-    public PRMRequestVariables(int approved, int finished, int submitted, String prmStart, String prmEnd) throws ParseException {
+    public PRMRequestVariables(int approved, int finished, int submitted, String prmStart, String prmEnd,String poCode, String flowType) throws ParseException {
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
         this.approved = approved;
@@ -24,6 +26,16 @@ public class PRMRequestVariables {
         }
         if (!(null == prmEnd) && !("".equals(prmEnd))) {
             this.prmEnd = formatter.parse(prmEnd);
+        }
+        if (!(null == poCode) && !("".equals(poCode))) {
+            this.poCode = poCode;
+        }else {
+            this.poCode = null;
+        }
+        if (!(null == flowType) && !("".equals(flowType))) {
+            this.flowType = flowType;
+        }else{
+            this.flowType = null;
         }
     }
 
@@ -67,6 +79,22 @@ public class PRMRequestVariables {
         this.prmEnd = prmEnd;
     }
 
+    public String getPoCode() {
+        return poCode;
+    }
+
+    public void setPoCode(String poCode) {
+        this.poCode = poCode;
+    }
+
+    public String getFlowType() {
+        return flowType;
+    }
+
+    public void setFlowType(String flowType) {
+        this.flowType = flowType;
+    }
+
     @Override
     public String toString() {
         return "PRMRequestVariables{" +
@@ -75,6 +103,8 @@ public class PRMRequestVariables {
                 ", submitted=" + submitted +
                 ", prmStart=" + prmStart +
                 ", prmEnd=" + prmEnd +
+                ", poCode='" + poCode + '\'' +
+                ", flowType='" + flowType + '\'' +
                 '}';
     }
 }

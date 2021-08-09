@@ -68,10 +68,13 @@ public class ProcurementRequisitionController {
 
     @GetMapping("/prm/flow_type")
     public String getFlowType(Model model){
-        List flowType = new ArrayList();
+        /*List flowType = new ArrayList();
         flowType.add(PrFlowEnum.RM_ASSEMBLY_MRO);
         flowType.add(PrFlowEnum.EXPENSE);
-        flowType.add(PrFlowEnum.CAPITALIZED_PROJECT_FIXED_ASSET);
+        flowType.add(PrFlowEnum.CAPITALIZED_PROJECT_FIXED_ASSET);*/
+
+        List flowType = FlowType.getFlowType();
+
         List<Costcenter> ccs = prs.getCostcenterDesc();
         model.addAttribute("flow_type",flowType);
         model.addAttribute("ccs",ccs);
@@ -84,7 +87,7 @@ public class ProcurementRequisitionController {
         ProcurementRequisitionMain prm = prs.getPRMainById(id);
         List prds = prs.getPRDetailsByPRMId(id);
         List ccs = prs.getCostcenterDesc();
-        List cts = prs.getCostType();
+        List cts = prs.getCostType(prm.getCostCenter());
         List pps = prs.getPrProject();
 
         model.addAttribute("prds", prds);
@@ -143,6 +146,8 @@ public class ProcurementRequisitionController {
 
     @GetMapping("/prm/history")
     public String readPRMHistory(Model model){
+        List flowType = FlowType.getFlowType();
+        model.addAttribute("flow_type", flowType);
 
         return "pr/prm_history";
     }
@@ -261,13 +266,15 @@ public class ProcurementRequisitionController {
         return "pr/myTasks";
     }
 
-    @GetMapping("/prm/download/{completed}/{agreed}/{start}/{end}")
+    @GetMapping("/prm/download/{completed}/{agreed}/{start}/{end}/{flowType}/{poCode}")
     public void exportToExcel(
-            //@RequestBody PRMRequestVariables prmrv,
+
             @PathVariable int completed,
             @PathVariable int agreed,
                               @PathVariable String start,
                               @PathVariable String end,
+                              @PathVariable String flowType,
+                              @PathVariable String poCode,
                               HttpServletResponse response) throws IOException, ParseException {
 
         response.setContentType("application/octet-stream");
@@ -281,8 +288,11 @@ public class ProcurementRequisitionController {
 
         if (start.equals("null")) { start = null ;};
         if (end.equals("null")) { end = null ;};
+        if (poCode.equals("null")) { poCode = null ;};
+        if (flowType.equals("null")) { flowType = null ;};
 
-        PRMRequestVariables prmrv = new PRMRequestVariables(completed,agreed,1,start,end);
+        PRMRequestVariables prmrv = new PRMRequestVariables(completed,agreed,1,start,end,poCode,flowType);
+
         List<ProcurementRequisitionMain> prms = prs.getPRMHistory(prmrv);
 
         PrmExcelExporter excelExporter = new PrmExcelExporter(prms);

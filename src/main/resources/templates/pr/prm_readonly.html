@@ -35,12 +35,13 @@
                 <strong><label th:text="#{pr.flow_type_s} + ':'"></label></strong>
                 <h6 th:text="${prm.flowType}"></h6>
             </td>
-        </tr>
-        <tr>
+
             <td class="text-left">
                 <strong><label th:text="#{pr.apl.username} + ':'"></label></strong>
                 <h6 th:text="${orgName}"></h6>
             </td>
+        </tr>
+        <tr>
             <td class="text-left">
                 <strong><label th:text="#{pr.cost_center} + ':'"></label></strong>
                 <h6 th:text="${prm.costCenter}"/>
@@ -49,8 +50,7 @@
                 <strong><label th:text="#{pr.apl.dept} + ':'"></label></strong>
                 <h6 th:text="${prm.aplDept}"/>
             </td>
-        </tr>
-        <tr>
+
             <td class="text-left">
                 <strong><label th:text="#{pr.project.name} + ':'"></label></strong>
                 <h6 th:text="${prm.projectName}"/>
@@ -59,9 +59,22 @@
                 <strong><label th:text="#{pr.apl.creation.date} + ':'"></label></strong>
                 <h6 th:text="${#dates.format(prm.prAplDate,'yyyy-MM-dd')}"/>
             </td>
-            <td colspan="2">
+        </tr>
+        <tr>
+            <td class="text-left">
                 <strong><label th:text="#{pr.prm.total.estcost} + ':'"></label></strong>
                 <h6 th:text="${prm.totalEstCost}"/>
+            </td>
+            <td class="text-left">
+                <div th:if="${curtAssignee=='PR-PURCHASER'}">
+                    <div class="mt-1">
+                        <strong><label th:text="#{pr.prm.pocode} + ':'"></label></strong>
+                    </div>
+
+                        <textarea rows="2" cols="50"  class="form-group" th:value="${prm.poCode}" id="f_poCode"></textarea>
+
+                </div>
+
             </td>
         </tr>
     </table>
@@ -79,8 +92,9 @@
                 <th scope="col" th:text="#{pr.details.erp.code}"></th>
                 <th scope="col" th:text="#{pr.details.erp.desc}"></th>
                 <th scope="col" th:text="#{pr.details.erp.brand_size}"></th>
-                <th scope="col" th:text="#{pr.details.qty}"></th>
                 <th scope="col" th:text="#{pr.details.erp.unit}"></th>
+                <th scope="col" th:text="#{pr.details.qty}"></th>
+                <th scope="col" th:text="#{pr.details.unit.cost}"></th>
                 <th scope="col" th:text="#{pr.details.est.cost}"></th>
                 <th scope="col" th:text="#{pr.details.target.date}"></th>
             </tr>
@@ -99,13 +113,17 @@
                     <samll th:text="${prd.itemErpBrandSize}"></samll>
                 </td>
                 <td>
+                <samll th:text="${prd.itemErpUnit}"></samll>
+                </td>
+                <td>
                     <samll th:text="${prd.Qty}"></samll>
                 </td>
-                <td>
-                    <samll th:text="${prd.itemErpUnit}"></samll>
-                </td>
+
                 <td>
                     <samll th:text="${prd.estCost}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.totalEstCost}"></samll>
                 </td>
                 <td>
                     <samll th:text="${#dates.format(prd.targetDate,'yyyy-MM-dd')}"></samll>
@@ -241,6 +259,12 @@
 
             } else {
 
+                if(curtAssignee === "PR-PURCHASER"){
+                    let success = updatePoCode(prMainId);
+                    if(!success){
+                        return false;
+                    }
+                }
                 ajax_approvalByGroup(curtAssignee, taskId, agree);
             }
             //updated status of PRM
@@ -276,6 +300,16 @@
         })
     })
 
+    function updatePoCode(prmId){
+        const poCode = $('#f_poCode').val();
+        if ($.trim(poCode)===""){
+            show_mes("msg","Po code cannot be empty.", true);
+            return false;
+        }
+        ajax_fillPoCodeByPrmId(prmId,poCode);
+        return true;
+    }
+
     function ajax_submitComment(json_comment) {
         $.ajax({
             type: "POST",
@@ -296,7 +330,7 @@
     }
 
     function ajax_approvalByGroup(role, taskId, approved) {
-
+        $("#pr_form_submit").prop("disabled",true);
         $.ajax({
             type: "POST",
             contentType: "application/json",
@@ -315,7 +349,7 @@
     }
 
     function ajax_approvalByPerson(ssn, taskId, approved) {
-
+        $("#pr_form_submit").prop("disabled",true);
         $.ajax({
             type: "POST",
             contentType: "application/json",
@@ -351,6 +385,27 @@
         })
     }
 
+    function ajax_fillPoCodeByPrmId(prmId,poCode){
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/api/pr/pocode/" + prmId + "/" + poCode,
+            dataType: 'text',
+            cache: false,
+            async: false,
+            success: function (data) {
+                if(data.responseText!= "0"){
+                    show_mes("msg", [[#{page.submission.succeed}]], false);
+                }else{
+                    show_mes("msg", [[#{page.submission.failed}]], true);
+                }
+
+            },
+            error: function (data) {
+                show_mes("msg", [[#{page.submission.failed}]], true);
+            }
+        })
+    }
 
 </script>
 </body>

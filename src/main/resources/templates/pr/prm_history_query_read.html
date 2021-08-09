@@ -6,6 +6,7 @@
                 <th scope="col">#</th>
                 <th scope="col" th:text="#{pr.title}"></th>
                 <th scope="col" th:text="#{pr.no}"></th>
+                <th scope="col" th:text="#{pr.prm.pocode}"></th>
                 <th scope="col" th:text="#{pr.flow_type_s}"></th>
                 <th scope="col" th:text="#{pr.cost_center}"></th>
                 <th scope="col" th:text="#{pr.apl.dept}"></th>
@@ -14,6 +15,7 @@
                 <th scope="col" th:text="#{pr.process}"></th>
                 <th scope="col" th:text="#{pr.pass}"></th>
                 <th scope="col" th:text="#{pr.prm.total.estcost}"></th>
+
                 <th scope="col" th:text="#{created.date}"></th>
             </tr>
             </thead>
@@ -30,6 +32,9 @@
                 </td>
                 <td>
                     <samll th:text="${prm.prNo}"></samll>
+                </td>
+                <td>
+                    <small th:text="${prm.poCode}"></small>
                 </td>
                 <td>
                     <samll th:text="${prm.flowType}"></samll>
@@ -76,6 +81,7 @@
                 <td>
                     <small th:text="${prm.totalEstCost}"></small>
                 </td>
+
                 <td>
                     <samll th:text="${#dates.format(prm.prAplDate,'yyyy-MM-dd')}"></samll>
                 </td>

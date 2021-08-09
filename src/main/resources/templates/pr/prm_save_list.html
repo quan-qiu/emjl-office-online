@@ -80,7 +80,7 @@
 </div>
 <div class="card mt-3">
     <div class="btn-toolbar mb-2 mb-md-0">
-    <button type="button" class="btn btn-info mx-2" id="display_pr_submitted">Display submitted PR</button>
+    <button type="button" class="btn btn-info mx-2" id="display_pr_submitted" th:text="#{pr.display.submitted}"></button>
     </div>
     <div class="card-header">
         <h5 th:text="#{pr.submitted}"></h5>
@@ -161,6 +161,7 @@
     <div class="modal-dialog " style="max-width: 80%!important;" role="document">
         <div class="modal-content">
             <div class="modal-header d-block">
+                <h4 class="modal-title " th:text="#{pr.details.detail}"></h4>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body mx-2" id="v_pr_item_details">
@@ -197,7 +198,7 @@
             ajax_getFlowType();
         });
 
-        $(".modal").on('hidden.bs.modal',function (){
+        $(".modal").not("#assignee_modal").on('hidden.bs.modal',function (){
             $("#saved_list").trigger("click");
         })
     });

@@ -20,17 +20,17 @@
                         <label th:text="#{pr.cost_center} + ':'" for="f_costCenter"></label>
                         <i class='fa fa-asterisk'
                            style='color: red;font-size: 0.5rem; '></i>
-
-                        <select class="form-control" name="costCenter" id="f_costCenter" th:field="*{costCenter}">
+                        <input type="text" class="form-control" th:field="*{costCenter}" readonly>
+                        <!--<select class="form-control" name="costCenter" id="f_costCenter" th:field="*{costCenter}" readonly="true">
                             <option value="">Select a costcenter</option>
                             <option
                                     th:each="cc : ${ccs}"
                                     th:selected="${cc.costcenter == prm.costCenter}"
                                     th:value="${cc.costcenter}"
-                                    th:text="${cc.costcenter + '--' + cc.description}"
+                                    th:text="${cc.costcenter + '&#45;&#45;' + cc.description}"
                                     th:data-desc="${cc.description}">
                             </option>
-                        </select>
+                        </select>-->
                     </div>
                 </div>
                 <div class="col-sm form-group">
@@ -72,7 +72,7 @@
                                style='color: red;font-size: 0.5rem; '></i>
                             <!-- <input type="text" class="form-control" th:field="*{projectName}" id="f_projectName">-->
                             <select class="form-control" name="projectName" id="f_projectName" th:field="*{projectName}">
-                                <option value="">Select a project</option>
+                                <option value="">Select a type</option>
                                 <option th:each="ct : ${cts}"
                                         th:selected="${ct.costType == prm.projectName}"
                                         th:value="${ct.costType}"
@@ -102,14 +102,15 @@
                         </div>
                     </div>
                 </div>
-
+<!--
                 <div class="col-sm form-group">
                     <span id="erp_code"></span>
-                </div>
+                </div>-->
+
             </div>
             <div class="row">
                 <div class="col-lg text-center">
-                    <button class="btn btn-sm btn-primary" id="btn_prm_update" th:text="#{pr.prm.update}"></button>
+                    <button class="btn btn-primary" id="btn_prm_update" th:text="#{pr.prm.update}"></button>
                 </div>
             </div>
         </div>
@@ -144,8 +145,9 @@
                 <th scope="col" th:text="#{pr.details.erp.code}"></th>
                 <th scope="col" th:text="#{pr.details.erp.desc}"></th>
                 <th scope="col" th:text="#{pr.details.erp.brand_size}"></th>
-                <th scope="col" th:text="#{pr.details.qty}"></th>
                 <th scope="col" th:text="#{pr.details.erp.unit}"></th>
+                <th scope="col" th:text="#{pr.details.qty}"></th>
+                <th scope="col" th:text="#{pr.details.unit.cost}"></th>
                 <th scope="col" th:text="#{pr.details.est.cost}"></th>
                 <th scope="col" th:text="#{pr.details.target.date}"></th>
             </tr>
@@ -172,14 +174,18 @@
                 <td>
                     <samll th:text="${prd.itemErpBrandSize}"></samll>
                 </td>
-                <td>
-                    <samll th:text="${prd.Qty}"></samll>
-                </td>
+
                 <td>
                     <samll th:text="${prd.itemErpUnit}"></samll>
                 </td>
                 <td>
+                    <samll th:text="${prd.Qty}"></samll>
+                </td>
+                <td>
                     <samll th:text="${prd.estCost}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.totalEstCost}"></samll>
                 </td>
                 <td>
                     <samll th:text="${#dates.format(prd.targetDate,'yyyy-MM-dd')}"></samll>
@@ -264,13 +270,14 @@
 
     $(document).ready(function () {
 
+
         $("#f_projectName").change(function (e){
             const selected = $(this).find('option:selected');
             const erp = selected.data('erp');
 
-            if(!($(this).val() === "")){
+/*            if(!($(this).val() === "")){
                 $("#erp_code").text(erp);
-            }
+            }*/
         })
 
         $("#f_costCenter").change(function (e){
@@ -280,6 +287,13 @@
             if(!($(this).val() === "")){
                 $("#f_aplDept").val(dept);
             }
+
+            let flow_type = $("#f_flowType").val();
+            if(flow_type === "EXPENSE"){
+                const costcenter = $("#f_costCenter").val();
+                ajax_getCostTypeByCostcenter(costcenter);
+            }
+
         })
 
         $("#btn_prm_update").click(function (e) {
@@ -300,11 +314,12 @@
                     ajax_getPrdNewForm($("#f_prm_id").val(), "null");
                     break;
                 case "EXPENSE":
-                    ajax_getPrdNewForm($("#f_prm_id").val(), "$");
+                    const erp1 = $("#f_projectName option:selected").data("erp")
+                    ajax_getPrdNewForm($("#f_prm_id").val(), erp1);
                     break;
                 case "CAPITALIZED_PROJECT_FIXED_ASSET":
-                    const erp = $("#f_projectName option:selected").data("erp")
-                    ajax_getPrdNewForm($("#f_prm_id").val(), erp);
+                    const erp2 = $("#f_projectName option:selected").data("erp")
+                    ajax_getPrdNewForm($("#f_prm_id").val(), erp2);
                     break;
             }
         })
@@ -346,6 +361,12 @@
         })
 
         $("#pr_form_submit").click(function (e) {
+            $("#btn_prm_update").trigger("click");
+
+            const valid = verification();
+            if (valid === false){
+                return false;
+            }
             const flow_type= $("#f_flowType").val();
             if (flow_type === "RM_ASSEMBLY_MRO"){
                 let num = $(".l_erpCode").length;
@@ -533,6 +554,28 @@
             }
         })
         return num;
+    }
+
+    function ajax_getCostTypeByCostcenter(costcenter){
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/api/pr/costtype/" + costcenter,
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                let $el = $("#f_projectName");
+                $el.empty();
+                $el.append($('<option></option>').text("Select a type").attr('value',''));
+                if(data.length > 0){
+                    $.each(data,function (index){
+                        $el.append($('<option></option>').attr('value', data[index]['costType']).attr('data-erp',data[index]['erpCode']).text(
+                            data[index]['costType'] + "--" + data[index]['erpCode']))
+                    })
+                }
+            }
+        })
     }
 
 </script>

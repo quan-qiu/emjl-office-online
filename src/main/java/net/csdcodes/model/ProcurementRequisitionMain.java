@@ -50,34 +50,11 @@ public class ProcurementRequisitionMain {
     protected int approved;
     @Column(name="submitted")
     protected int submitted;
+    @Column(name = "po_code")
+    protected String poCode;
 
     protected float totalEstCost;
 
-    public ProcurementRequisitionMain(int id, String prTitle, String aplUserSsn, String aplUserName,
-                                      String costCenter, String aplDept, String prNo, Date prAplDate,
-                                      Date prAplUpdateDate, String projectName, String prStatus,
-                                      String prProcess, String prPass, String flowType, int finished,
-                                      int approved, int submitted, float totalEstCost) {
-        this.id = id;
-        this.prTitle = prTitle;
-        this.aplUserSsn = aplUserSsn;
-        this.aplUserName = aplUserName;
-        this.costCenter = costCenter;
-        this.aplDept = aplDept;
-        this.prNo = prNo;
-        this.prAplDate = prAplDate;
-        this.prAplUpdateDate = prAplUpdateDate;
-        this.projectName = projectName;
-        this.prStatus = prStatus;
-        this.prProcess = prProcess;
-        this.prPass = prPass;
-        this.flowType = flowType;
-        this.finished = finished;
-        this.approved = approved;
-        this.submitted = submitted;
-        this.totalEstCost = totalEstCost;
-
-    }
 
     public ProcurementRequisitionMain() {
 
@@ -227,6 +204,14 @@ public class ProcurementRequisitionMain {
         this.totalEstCost = totalEstCost;
     }
 
+    public String getPoCode() {
+        return poCode;
+    }
+
+    public void setPoCode(String poCode) {
+        this.poCode = poCode;
+    }
+
     @Override
     public String toString() {
         return "ProcurementRequisitionMain{" +
@@ -247,6 +232,7 @@ public class ProcurementRequisitionMain {
                 ", finished=" + finished +
                 ", approved=" + approved +
                 ", submitted=" + submitted +
+                ", poCode='" + poCode + '\'' +
                 ", totalEstCost=" + totalEstCost +
                 '}';
     }

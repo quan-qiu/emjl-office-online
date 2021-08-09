@@ -15,10 +15,14 @@
     <div class="row">
         <span>PR process: </span> <b><h4 th:text="${prTitle}"></h4></b>
         <b><h4 th:text="${mailContent}"></h4></b>
-        <div th:if="${curtAssignee != 'FINISHED'}">
+<!--        <div th:if="${to != 'FINISHED' and to != 'PR-RECEIVER'}">
             <a th:href="${conPath + '/pr/prm/read/' + prmId}">Approval link</a>
         </div>
 
+        <div th:if="${to == 'PR-RECEIVER' or to == 'FINISHED'}">
+            <a th:href="${conPath + '/pr/prm/history/' + prmId}">Approval link</a>
+        </div>-->
+        <a th:href="${conPath}">Approval link</a>
     </div>
 </div>
 <br><br>
