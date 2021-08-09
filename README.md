@@ -1,8 +1,10 @@
-# spring-boot-internationalization-example
-Internationalization in Spring Boot.
-
-In this tutorial, we’ll explore with the help of an example how to add internationalization to our Spring Boot web Application.
+# emjl-office-online
+EUROMISI office online project
+1. Quick access to web applications.
+2.Company calendar management
+3.IT assets management
+4.Prcurment requirement procedure
 
 # visit
-https://csdcodes.net/spring-mvc/internationalization-in-spring-boot/
+http://localhost:8080
 
