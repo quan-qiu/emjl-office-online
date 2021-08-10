@@ -32,8 +32,8 @@ spring:
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
   mail:
     host: 183.2.143.59
-    username: euro-misi-it@euro-misi.cn
-    password: 4vWFQHBhVhXHNabg
+    username: 333@euro-misi.cn
+    password: 
     port: 465
     protocol: smtp
     default-encoding: UTF-8
