@@ -79,10 +79,6 @@ public class EmailApiController {
         logger.debug("inside sendAsynchronousMail api");
         String to = mail.getTo();
 
-        /*String url = request.getRequestURL().toString();
-        int first = url.indexOf("/");
-        int second = url.indexOf("/",first + 1);
-        int third = url.indexOf("/", second + 1);*/
         String urlRoot = RequestURLUtil.getSiteURL(request);
 
         if (to.startsWith("PR")){
@@ -91,29 +87,20 @@ public class EmailApiController {
             while (iterUsers.hasNext()){
                 mail.setTo(iterUsers.next().getEmail());
                 //doSendMail(prTitle,mail, url.substring(0,third),prmId);
-                doSendMail(prTitle,mail, urlRoot + "/pr/prm/read/" + prmId, to);
+                doSendMail(prTitle,mail, urlRoot + "/pr/prm/read/" + prmId + "/" + curtAssignee, to);
             }
             if(to.equals("PR-PURCHASER")){
-                System.out.println("-----send to receiver");
+                //System.out.println("-----send to receiver");
                 String content = "Dear receiver, here is a link to PR.";
                 ccMail(content, PR_RECEIVER, prTitle,mail, urlRoot+ "/pr/prm/history/" + prmId);
 
-                /*List<User> receivers = userService.getUserByRole("PR-RECEIVER");
-                Iterator<User> iterReceivers = receivers.iterator();
-                while (iterReceivers.hasNext()){
-                    mail.setTo(iterReceivers.next().getEmail());
-                    mail.setContent("Dear receiver, here is a link to PR.");
-                    System.out.println(mail.toString());
-                    //doSendMail(prTitle,mail, url.substring(0,third),prmId);
-                    doSendMail(prTitle,mail, url,prmId, "PR-RECEIVER");
-                }*/
             }
         }else{
             User toUser = userService.getUserBySsn(mail.getTo());
-            System.out.println(toUser.toString());
+            //System.out.println(toUser.toString());
             mail.setTo(toUser.getEmail());
             //doSendMail(prTitle,mail, url.substring(0,third),prmId);
-            doSendMail(prTitle,mail, urlRoot + "/pr/prm/read/" + prmId, to);
+            doSendMail(prTitle,mail, urlRoot + "/pr/prm/read/" + prmId + "/" + curtAssignee, to);
         }
 
     }
@@ -124,13 +111,14 @@ public class EmailApiController {
         while (iterReceivers.hasNext()){
             mail.setTo(iterReceivers.next().getEmail());
             mail.setContent(content);
-            System.out.println(mail.toString());
+            //System.out.println(mail.toString());
             //doSendMail(prTitle,mail, url.substring(0,third),prmId);
             doSendMail(prTitle,mail, url, PR_RECEIVER);
         }
     }
 
     private void doSendMail(String prTitle, Mail mail,String path, String to){
+        //System.out.println("---------path : "  + path);
         try{
             mail.setSubject("Notification from PR process administrator");
             Map<String, String> model = new HashMap<String, String>();

@@ -63,7 +63,7 @@ public class ProcurementRequisitionApiController {
 
     @PostMapping(value="/prm/update/{id}", produces = {MimeTypeUtils.APPLICATION_JSON_VALUE})
     public String updatePRMainById(@PathVariable int id, @RequestBody ProcurementRequisitionMain prm) {
-        System.out.println(prm);
+        //System.out.println(prm);
         try {
             int result = prs.updatePRMainById(id,prm);
 

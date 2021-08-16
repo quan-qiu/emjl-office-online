@@ -144,13 +144,13 @@ public class PrProcessApiController {
         boolean result = false;
 
         result = prProcessService.revokeProcessInstance(prmId);
-        System.out.println("prProcessService.revokeProcessInstance(prmId):" + result);
+        //System.out.println("prProcessService.revokeProcessInstance(prmId):" + result);
 
         prs.updatePrmApprovedStatus(0,prmId);
         prs.updatePrmFinishedStatus(0,prmId);
         prs.updatePrmSubmittedStatus(0,prmId);
         int action = prs.deleteProcurementRequisitionCommentByPrmId(prmId);
-        System.out.println("prs.deleteProcurementRequisitionCommentByPrmId(prmId):" + action);
+        //System.out.println("prs.deleteProcurementRequisitionCommentByPrmId(prmId):" + action);
 
 
         return "{\"finished\":"+ true + "}";

@@ -58,12 +58,12 @@ public class PrProcessService {
     ProcurementRequisitionService prs;
 
     public void deployProcessDefinition(){
-        System.out.println("---------------------------");
+        //System.out.println("---------------------------");
         Deployment deployment = repositoryService
                 .createDeployment()
                 .addClasspathResource("processes/pr-approval-flow.bpmn20.xml")
                 .deploy();
-        System.out.println("---------------------------");
+        //System.out.println("---------------------------");
     }
 
     public ProcessInstanceResponse initiateWorkflow(JsonObject variablesObj, User thisUser)

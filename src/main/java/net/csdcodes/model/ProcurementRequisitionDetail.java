@@ -40,6 +40,9 @@ public class ProcurementRequisitionDetail {
     @Column(name="target_date")
     protected Date targetDate;
 
+    @Column(name = "memo")
+    protected String memo;
+
     protected float totalEstCost;
 
     public int getId() {
@@ -136,6 +139,14 @@ public class ProcurementRequisitionDetail {
 
     public void setTotalEstCost(float totalEstCost) {
         this.totalEstCost = totalEstCost;
+    }
+
+    public String getMemo() {
+        return memo;
+    }
+
+    public void setMemo(String memo) {
+        this.memo = memo;
     }
 
     @Override

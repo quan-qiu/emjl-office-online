@@ -166,8 +166,8 @@ public class ProcurementRequisitionService {
                             PreparedStatement statement = con.prepareStatement("INSERT INTO [dbo].[pr_detail] " +
                                     "(pr_main_id, item_erp_code, item_erp_desc, " +
                                     "item_erp_brand_size, qty, item_erp_unit, " +
-                                    "est_cost, created_date, updated_date,target_date) " +
-                                    " values(?,?,?,?,?,?,?,?,?,?)");
+                                    "est_cost, created_date, updated_date,target_date,memo) " +
+                                    " values(?,?,?,?,?,?,?,?,?,?,?)");
                             statement.setInt(1, prd.getPrMainId());
                             statement.setString(2, prd.getItemErpCode());
                             statement.setString(3, prd.getItemErpDesc());
@@ -179,6 +179,7 @@ public class ProcurementRequisitionService {
                             statement.setString(9, DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.SIMPLIFIED_CHINESE).format(now));
                             statement.setString(10, prd.getTargetDate()!= null ?
                                     simpleDateFormat.format(prd.getTargetDate()): DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.SIMPLIFIED_CHINESE).format(now));
+                            statement.setString(11, prd.getMemo());
                             return statement;
                         }
                     });
@@ -205,12 +206,13 @@ public class ProcurementRequisitionService {
                         " item_erp_unit=?," +
                         " est_cost=?," +
                         " updated_date=?," +
-                        " target_date=?" +
+                        " target_date=?," +
+                        " memo=?" +
                         " where id=?",
                 new Object[]{prd.getItemErpCode(), prd.getItemErpDesc(), prd.getItemErpBrandSize(),
                         prd.getQty(), prd.getItemErpUnit(), prd.getEstCost(),
                         DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.SIMPLIFIED_CHINESE).format(now),
-                        simpleDateFormat.format(prd.getTargetDate()),
+                        simpleDateFormat.format(prd.getTargetDate()), prd.getMemo(),
                         prdId});
 
         return result;

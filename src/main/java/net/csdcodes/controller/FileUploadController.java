@@ -64,15 +64,15 @@ public class FileUploadController {
 
         switch (dirtype) {
             case "PR_PRD_TEMPLATE":
-                System.out.println("----- PR_PRD_TEMPLATE:" + Paths.get(rootDir + prdTemplateLocation));
+                //System.out.println("----- PR_PRD_TEMPLATE:" + Paths.get(rootDir + prdTemplateLocation));
                 file = storageService.loadAsResource(filename, Paths.get(rootDir + prdTemplateLocation));
                 break;
             case "PR_PRD_UPLOAD":
-                System.out.println(Paths.get(rootDir + prdUploadLocation).toString());
+                //System.out.println(Paths.get(rootDir + prdUploadLocation).toString());
                 file = storageService.loadAsResource(filename, Paths.get(rootDir + prdUploadLocation));
                 break;
         }
-        System.out.println(file.getFilename());
+        //System.out.println(file.getFilename());
         //Resource file = storageService.loadAsResource(filename);
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"" + file.getFilename() + "\"").body(file);

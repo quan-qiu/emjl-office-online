@@ -14,7 +14,7 @@ public class PrProcessApprovalHandler implements JavaDelegate {
     public void execute(DelegateExecution execution) {
 
         String orgName =(String) execution.getVariable("orgName");
-        System.out.println(orgName + " : Approved, sending an email");
+        //System.out.println(orgName + " : Approved, sending an email");
        // emailService.sendnotification();
     }
 }

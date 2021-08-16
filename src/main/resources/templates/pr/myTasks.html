@@ -21,7 +21,8 @@
                 </td>
                 <td>
                     <input type="text" th:value="${task.taskId}" id="task_id" hidden>
-                    <input type="text" th:value="${task.taskData.nextAssignee}" id="next_assignee" hidden>
+                    <input type="text" th:value="${task.taskData.nextAssignee}" class="next_assignee" hidden>
+                    <input type="text" th:value="${task.taskData.curtAssignee}" class="current_Assignee" hidden>
                     <input type="text" class="prmId" th:value="${task.taskData.mainId}" hidden>
 
                     <a class="read_prm" href="" ><i class="fa fa-info-circle fa-lg mr-2" style="color: green"></i>[[${task.taskData.prTitle}]]
@@ -61,19 +62,21 @@
             e.preventDefault();
             let prm_id = $(this).parent("td").find(".prmId").val();
            // let task_id = $("#task_id").val();
-           // let next_assignee = $("#next_assignee").val();
-            ajax_readPrm(prm_id);
+            let next_assignee = $(this).parent("td").find(".next_assignee").val();
+           let current_assignee = $(this).parent("td").find(".current_Assignee").val()
+            ajax_readPrm(prm_id,current_assignee);
         });
 
         $(".modal").on('hidden.bs.modal', function () {
             $("#my_tasks").trigger("click");
         });
     })
-    function ajax_readPrm(prm_id) {
+
+    function ajax_readPrm(prm_id,assignee) {
         $.ajax({
             type: "GET",
             contentType: "text/html",
-            url: "/pr/prm/read/" + prm_id ,
+            url: "/pr/prm/read/" + prm_id + "/" + assignee,
             dataType: 'html',
             cache: false,
             async: false,

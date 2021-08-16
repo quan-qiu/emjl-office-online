@@ -108,14 +108,19 @@ public class ProcurementRequisitionController {
         return "pr/prm_edit";
     }
 
-    @GetMapping("/prm/read/{prmId}")
-    public String readPRMById(@PathVariable int prmId,
+    @GetMapping("/prm/read/{prmId}/{assignee}")
+    public String readPRMById(@PathVariable int prmId,@PathVariable String assignee,
                               Model model){
         Task task = prProcessService.getTaskByPrmId(prmId);
         if (null != task){
+
             String taskId = task.getId();
-            System.out.println("/prm/read/{prmId} : " + prmId);
+
             Map<String, Object> variables= prProcessService.getTaskInstanceVariable(taskId);
+
+            if(!assignee.equals(variables.get("curtAssignee"))){
+                return "redirect:/pr/prm/history/" + prmId ;
+            }
 
             model.addAttribute("taskId", taskId);
             model.addAttribute("curtAssignee", variables.get("curtAssignee"));
@@ -181,7 +186,7 @@ public class ProcurementRequisitionController {
         model.addAttribute("prm",prm);
         model.addAttribute("prds",prds);
         model.addAttribute("prcs", prcs);
-        System.out.println(prm.toString());
+        //System.out.println(prm.toString());
         return "pr/prm_history_view";
     }
 
