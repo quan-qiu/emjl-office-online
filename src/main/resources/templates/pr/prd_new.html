@@ -144,7 +144,7 @@
                 a[x.name] = x.value;
                 return a;
             }, {});
-
+        $("#btn_new_save").prop("disabled",true);
         $.ajax({
             type: "POST",
             contentType: "application/json",

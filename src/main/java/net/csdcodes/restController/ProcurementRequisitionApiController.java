@@ -205,4 +205,39 @@ public class ProcurementRequisitionApiController {
         int result = prs.fillPoCodeByPrmId(poCode,prmId);
         return new ResponseEntity(result,HttpStatus.OK);
     }
+
+    @GetMapping("/project")
+    public ResponseEntity getProject(){
+        List pps = prs.getPrProject();
+        return new ResponseEntity(pps,HttpStatus.OK);
+    }
+
+    @PostMapping("/copy/{prmId}")
+    public ResponseEntity<ErrorMsg> copyCreatePrByPrmId(@PathVariable int prmId){
+        try{
+            int newId = prs.copyCreatePrmByPrmId(prmId);
+            System.out.println(newId);
+            int updatePrCode = prs.updatePrnoByPrmId(newId);
+
+            int result = prs.copyCreatePrdByPrmId(prmId, newId);
+
+            ErrorMsg em = new ErrorMsg();
+            em.setCode(HttpStatus.BAD_REQUEST.value());
+            em.setMessage("Operation succeed");
+
+            ResponseEntity<ErrorMsg> re = new ResponseEntity<ErrorMsg>(em,HttpStatus.OK);
+
+            //System.out.println(re.toString());
+            //System.out.println(re.getBody().toString());
+            return re;
+        }catch (Exception ex){
+            //System.out.println(ex.getMessage());
+            ErrorMsg em = new ErrorMsg();
+            em.setCode(HttpStatus.BAD_REQUEST.value());
+            em.setMessage(ex.getMessage());
+            ResponseEntity<ErrorMsg> re = new ResponseEntity<>(em,HttpStatus.BAD_REQUEST);
+            return re;
+        }
+
+    }
 }

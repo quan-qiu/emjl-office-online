@@ -37,7 +37,7 @@ public class ProcurementRequisitionService {
                 " on prm.id = prd1.pr_main_id" +
                 " where prm.apl_user_ssn=? " +
                 " and prm.pr_status='SAVED' and prm.pr_pass='' and prm.pr_process='' and prm.submitted=0" +
-                " order by prm.pr_apl_date desc";
+                " order by prm.id desc";
 
         List<ProcurementRequisitionMain> prm = jdbcTemplate.query(sql,
                 new Object[]{user_ssn},
@@ -83,7 +83,7 @@ public class ProcurementRequisitionService {
                         statement.setString(6, "");
                         statement.setString(7, DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.SIMPLIFIED_CHINESE).format(now));
                         statement.setString(8, DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.SIMPLIFIED_CHINESE).format(now));
-                        statement.setString(9, "");
+                        statement.setString(9, flowTypeObject.get("projectName") == null ? "" : flowTypeObject.get("projectName").getAsString());
                         statement.setString(10, String.valueOf(PrStatusEnum.SAVED));
                         statement.setString(11, "");
                         statement.setString(12, "");
@@ -489,6 +489,89 @@ public class ProcurementRequisitionService {
                 new Object[]{poCode,
                         DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.SIMPLIFIED_CHINESE).format(now),
                         prmId});
+
+        return result;
+    }
+
+    public int copyCreatePrmByPrmId(int prmId){
+
+        ProcurementRequisitionMain procurementRequisitionMain = getPRMainById(prmId);
+
+        System.out.println(procurementRequisitionMain);
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        LocalDateTime now = LocalDateTime.now();
+
+        int id = 0;
+
+        try {
+            jdbcTemplate.update(
+                    new PreparedStatementCreator() {
+                        @Override
+                        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                            String sql = "INSERT INTO [dbo].[pr_main]" +
+                                    "(pr_title, apl_user_name, apl_user_ssn, cost_center, " +
+                                    "apl_dept, pr_no, pr_apl_date, pr_apl_update_date, " +
+                                    "project_name, pr_status, pr_process, pr_pass,flow_type) " +
+                                    "values(?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+                            PreparedStatement statement = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+                            statement.setString(1, procurementRequisitionMain.getPrTitle());
+                            statement.setString(2, procurementRequisitionMain.getAplUserName());
+                            statement.setString(3, procurementRequisitionMain.getAplUserSsn());
+                            statement.setString(4, procurementRequisitionMain.getCostCenter());
+                            statement.setString(5, procurementRequisitionMain.getAplDept());
+                            statement.setString(6, "");
+                            statement.setString(7, DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.SIMPLIFIED_CHINESE).format(now));
+                            statement.setString(8, DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.SIMPLIFIED_CHINESE).format(now));
+                            statement.setString(9, procurementRequisitionMain.getProjectName());
+                            statement.setString(10, String.valueOf(PrStatusEnum.SAVED));
+                            statement.setString(11, "");
+                            statement.setString(12, "");
+                            statement.setString(13, procurementRequisitionMain.getFlowType());
+
+                            return statement;
+                        }
+                    }, keyHolder);
+
+            id = keyHolder.getKey().intValue();
+        }catch(Exception ex){
+            System.out.println(ex.getMessage());
+        }
+        return id;
+
+    }
+
+    public int copyCreatePrdByPrmId(int prmId, int newId){
+
+        LocalDateTime now = LocalDateTime.now();
+
+        String sql = "INSERT INTO [dbo].[pr_detail](pr_main_id, item_erp_code, item_erp_desc, " +
+                "item_erp_brand_size, qty, item_erp_unit, " +
+                "est_cost, created_date, updated_date, target_date, memo) " +
+                "select ?, item_erp_code, item_erp_desc, item_erp_brand_size, " +
+                "qty, item_erp_unit, est_cost," +
+                " ?, ?, ?, " +
+                "memo from [dbo].[pr_detail] pd where pd.pr_main_id=?";
+        int result = 0;
+        try{
+            result = jdbcTemplate.update(
+                    new PreparedStatementCreator() {
+                        @Override
+                        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                            PreparedStatement statement = con.prepareStatement(sql);
+                            statement.setInt(1, newId);
+                            statement.setString(2, DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.SIMPLIFIED_CHINESE).format(now));
+                            statement.setString(3, DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.SIMPLIFIED_CHINESE).format(now));
+                            statement.setString(4, DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.SIMPLIFIED_CHINESE).format(now));
+                            statement.setInt(5, prmId);
+                            return statement;
+                        }
+                    });
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
 
         return result;
     }

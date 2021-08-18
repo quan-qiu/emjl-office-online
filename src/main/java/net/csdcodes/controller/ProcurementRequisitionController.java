@@ -76,10 +76,15 @@ public class ProcurementRequisitionController {
         List flowType = FlowType.getFlowType();
 
         List<Costcenter> ccs = prs.getCostcenterDesc();
+
+        List pps = prs.getPrProject();
+
         model.addAttribute("flow_type",flowType);
         model.addAttribute("ccs",ccs);
+
         return "pr/flow_type";
     }
+
 
     @GetMapping("/prm/{id}")
     public String getPRMById(@PathVariable int id, Model model){

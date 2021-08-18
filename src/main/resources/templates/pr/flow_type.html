@@ -17,6 +17,7 @@
                     <option th:each="type:${flow_type}" th:text="${type}"></option>
                 </select>
                 </div>
+
             </div>
             <div class="row flex-row">
                 <div class="col-sm form-group mx-2 my-2">
@@ -33,6 +34,17 @@
                         </option>
                     </select>
                 </div>
+                <div class="col-sm form-group mx-2 my-2" style="display: none;" id="d_projectName">
+                    <label th:text="#{pr.cost.type} + ':'" for="projectName"></label>
+                    <i class='fa fa-asterisk'
+                       style='color: #ff0000;font-size: 0.5rem; '></i>
+                    <!-- <input type="text" class="form-control" th:field="*{projectName}" id="f_projectName">-->
+                    <select class="form-control" name="projectName" id="projectName" >
+                    </select>
+                </div>
+
+            </div>
+            <div class="row flex-row">
                 <div class="col-sm form-group mx-2 my-2">
                     <label th:text="#{pr.apl.dept} + ':'" for="aplDept"></label>
                     <input type="text" class="form-control" name="aplDept"  id="aplDept" readonly>
@@ -49,14 +61,39 @@
 <script th:inline="javascript">
     $(document).ready(function () {
 
-        $("#costCenter").change(function (e){
+
+        $("#costCenter").change(function (){
             const selected = $(this).find('option:selected');
             const dept = selected.data('desc');
 
             if(!($(this).val() === "")){
                 $("#aplDept").val(dept);
+
+                if ($("#flow_type").val() === "EXPENSE"){
+                    $("#d_projectName").css("display", 'block' );
+                    ajax_getCostTypeByCostcenter($(this).val());
+                }
             }
         })
+
+        $("#flow_type").change(function (){
+
+            if(($(this).val()=== "EXPENSE")){
+                $("#d_projectName").css("display", 'block' );
+                ajax_getCostTypeByCostcenter($("#costCenter").val());
+
+            }
+            if(($(this).val()=== "CAPITALIZED_PROJECT_FIXED_ASSET")){
+                $("#d_projectName").css("display", 'block' );
+                ajax_getProject();
+
+            }
+            if(($(this).val()=== "RM_ASSEMBLY_MRO")){
+                $("#d_projectName").css("display", 'none' );
+            }
+        })
+
+
 
         $("#submit").click(function (e) {
             e.preventDefault();
@@ -83,9 +120,13 @@
 
         for (let i=0; i< select_len; i++){
             if ($.trim($("select")[i].value) === ""){
-                result = false;
-                show_mes("msg",[[#{page.input.required}]],true);
-                break;
+                if (($("select")[i].getAttribute("id") ==="projectName") && ($("#flow_type").val() === "RM_ASSEMBLY_MRO")) {
+                }else{
+                    result = false;
+                    show_mes("msg",[[#{page.input.required}]],true);
+                    break;
+                }
+
             }
         }
 
@@ -97,6 +138,7 @@
         const json_formData = $('#f_flow_type').serializeArray()
             .reduce(function(a, x) { a[x.name] = x.value; return a; }, {});
 
+        //alert(JSON.stringify(json_formData));
 
         $.ajax({
             type: "POST",
@@ -129,6 +171,50 @@
                 $el = $("#page_detail");
                 $el.empty();
                 $el.html(data);
+            }
+        })
+    }
+
+    function ajax_getCostTypeByCostcenter(costcenter){
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/api/pr/costtype/" + costcenter,
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                let $el = $("#projectName");
+                $el.empty();
+                $el.append($('<option></option>').text("Select a type").attr('value',''));
+                if(data.length > 0){
+                    $.each(data,function (index){
+                        $el.append($('<option></option>').attr('value', data[index]['costType']).attr('data-erp',data[index]['erpCode']).text(
+                            data[index]['costType'] + "--" + data[index]['erpCode']))
+                    })
+                }
+            }
+        })
+    }
+
+    function ajax_getProject(){
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/api/pr/project",
+            dataType: 'json',
+            cache: false,
+            async: false,
+            success: function (data) {
+                let $el = $("#projectName");
+                $el.empty();
+                $el.append($('<option></option>').text("Select a project").attr('value',''));
+                if(data.length > 0){
+                    $.each(data,function (index){
+                        $el.append($('<option></option>').attr('value', data[index]['projectName']).attr('data-erp',data[index]['erpCode']).text(
+                            data[index]['projectName'] + "--" + data[index]['erpCode']))
+                    })
+                }
             }
         })
     }

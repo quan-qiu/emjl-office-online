@@ -129,7 +129,7 @@
                 a[x.name] = x.value;
                 return a;
             }, {});
-
+        $("#btn_edit_submit").prop("disabled",true);
         $.ajax({
             type: "POST",
             contentType: "application/json",
