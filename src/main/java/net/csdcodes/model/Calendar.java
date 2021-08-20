@@ -22,6 +22,9 @@ public class Calendar {
     @Column(name="type")
     protected String type;
 
+    @Column(name="flag")
+    protected String flag;
+
     public int getId() {
         return id;
     }
@@ -46,12 +49,21 @@ public class Calendar {
         this.type = type;
     }
 
+    public String getFlag() {
+        return flag;
+    }
+
+    public void setFlag(String flag) {
+        this.flag = flag;
+    }
+
     @Override
     public String toString() {
         return "Calendar{" +
                 "id=" + id +
                 ", specialDate=" + specialDate +
                 ", type='" + type + '\'' +
+                ", flag='" + flag + '\'' +
                 '}';
     }
 }

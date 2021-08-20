@@ -71,13 +71,22 @@
                 if (date.getDay() === 6 || date.getDay() === 0) {
                     $(element).css('background-color', 'pink');
                     $(element).css('border-radius', '15px');
+                };
+
+                if(circleDateTime[0].indexOf(date.getTime()) >= 0){
+                    let index = circleDateTime[0].indexOf(date.getTime());
+                    if(circleDateTime[1][index] === "h"){
+                        $(element).css('background-color', 'red');
+                        $(element).css('color', 'white');
+                        $(element).css('border-radius', '15px');
+                    }
+                    if(circleDateTime[1][index] === "w"){
+                        $(element).css('background-color', 'white');
+                        $(element).css('color', 'black');
+
+                    }
                 }
-                ;
-                if (circleDateTime.indexOf(date.getTime()) >= 0) {
-                    $(element).css('background-color', 'red');
-                    $(element).css('color', 'white');
-                    $(element).css('border-radius', '15px');
-                }
+
             }
         });
 
@@ -86,6 +95,8 @@
 
     function ajax_get_holiday(year) {
         let dateTime = [];
+        let dateItem = [];
+        let flagItem = [];
         $.ajax({
             type: "GET",
             contentType: "application/json",
@@ -94,13 +105,17 @@
             cache: false,
             async: false,
             success: function (data) {
+
                 $.each(data, function (index) {
-                    dateTime.push(new Date(data[index][0], data[index][1], data[index][2]).getTime())
+                    let dataJson = '{"flag":'+ data[index][3] +',"date":'+ new Date(data[index][0], data[index][1], data[index][2]).getTime()+'}';
+                    dateItem.push(new Date(data[index][0], data[index][1], data[index][2]).getTime());
+                    flagItem.push(data[index][3]);
                 });
                 console.log(dateTime);
             }
         })
-
+        dateTime.push(dateItem);
+        dateTime.push(flagItem)
         return dateTime;
     }
 </script>

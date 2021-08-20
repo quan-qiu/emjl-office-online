@@ -21,7 +21,9 @@
             <tr th:each="prm,iter:${prms}">
                 <td>
                     <span th:text="${iter.index +1 }"></span>
-                    <button class="copy_pr"><i class="fa fa-copy" style="color: green" aria-hidden="true"></i></button>
+                    <button class="btn btn-link copy_pr" type='button' title="Copy">
+                        <i class="fa fa-files-o fa-lg" style="color: green" aria-hidden="true"></i>
+                    </button>
                 </td>
                 <td>
                     <a class="a_read">
@@ -291,6 +293,38 @@
                     error: function () {
                         alert("Service failure");
                         //show_mes("reEdit-msg","Service failure",true);
+                    }
+                })
+            }
+        })
+    }
+
+    function ajax_CopyCreatePrByPrmId(prmId){
+        $("#prm_copy_modal").modal();
+        $("#prm_copy_modal .modal-footer button ").on("click", function (e) {
+            const $button = $(e.target);
+
+            if ($button.text() === "Yes") {
+                $(this).prop("disabled",true);
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    url: "/api/pr/copy/" + prmId,
+                    dataType: 'text/json',
+                    cache: false,
+                    async: false,
+/*                    success: function (data, textStatus, jqXHR) {
+                        alert("success");
+                        alert(data);
+                        alert(jqXHR); //status is 204
+                        alert($.parseJSON(data.responseText));
+                    },*/
+                    complete: function(data) {
+                        if(data.status === '200'){
+                            show_mes("c-msg",JSON.parse(data.responseText)["message"],true);
+                        }else{
+                            show_mes("c-msg",JSON.parse(data.responseText)["message"],false);
+                        }
                     }
                 })
             }

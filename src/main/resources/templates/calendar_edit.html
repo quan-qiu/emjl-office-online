@@ -7,6 +7,7 @@
                 <th scope="col"></th>
                 <th scope="col" th:text="#{calendar.special_day}"></th>
                 <th scope="col" th:text="#{calendar.type}"></th>
+                <th scope="col" th:text="#{calendar.flag}"></th>
             </tr>
             </thead>
             <tr th:each="calendar,iter:${specialDays}">
@@ -24,7 +25,9 @@
                 <td>
                     <samll th:text="${calendar.type}"></samll>
                 </td>
-
+                <td>
+                    <samll th:text="${calendar.flag == 'h' ? 'Holiday' : 'Working day'}"></samll>
+                </td>
             </tr>
         </table>
     </div>

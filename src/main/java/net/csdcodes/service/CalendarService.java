@@ -43,11 +43,12 @@ public class CalendarService {
                 new PreparedStatementCreator() {
                     @Override
                     public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                        PreparedStatement statement = con.prepareStatement("INSERT INTO calendar(special_date, type)" +
-                                        " values(?,?)",
+                        PreparedStatement statement = con.prepareStatement("INSERT INTO calendar(special_date, type, flag)" +
+                                        " values(?,?,?)",
                                 Statement.RETURN_GENERATED_KEYS);
                         statement.setString(1, simpleDateFormat.format(calendar.getSpecialDate()));
                         statement.setString(2, calendar.getType());
+                        statement.setString(3, calendar.getFlag());
                         return statement;
                     }
                 },

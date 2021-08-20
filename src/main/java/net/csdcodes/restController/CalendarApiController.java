@@ -95,10 +95,11 @@ public class CalendarApiController {
 
             java.util.Calendar cal = java.util.Calendar.getInstance();
             cal.setTime(day.getSpecialDate());
-            int[] oneDay = new int[3];
-            oneDay[0] = cal.get(java.util.Calendar.YEAR);
-            oneDay[1] = cal.get(java.util.Calendar.MONTH);
-            oneDay[2] = cal.get(java.util.Calendar.DAY_OF_MONTH);
+            String[] oneDay = new String[4];
+            oneDay[0] = Integer.toString(cal.get(java.util.Calendar.YEAR));
+            oneDay[1] = Integer.toString(cal.get(java.util.Calendar.MONTH));
+            oneDay[2] = Integer.toString(cal.get(java.util.Calendar.DAY_OF_MONTH));
+            oneDay[3] = day.getFlag();
             dayList.add(oneDay);
 
         }
