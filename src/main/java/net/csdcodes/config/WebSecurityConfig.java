@@ -82,12 +82,12 @@ public class WebSecurityConfig  extends WebSecurityConfigurerAdapter{
 
        http.csrf().disable()
                .authorizeRequests()
-               .antMatchers("/","/calendar","/webjars/**","/img/**","/","/it-asset/**","/api/**/**/**").permitAll()
+               .antMatchers("/","/favicon.ico","/calendar","/webjars/**","/img/**","/","/it-asset/**","/api/**/**/**").permitAll()
                .anyRequest().authenticated()
                .and()
                .formLogin()
                    .loginPage("/login")
-                    .loginProcessingUrl("/login")
+                   .loginProcessingUrl("/login")
 /*                    .defaultSuccessUrl("/it-asset/index",true)*/
                    .permitAll()
                .and()

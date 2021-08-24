@@ -26,6 +26,8 @@ public class ProcurementRequisitionMain {
     protected String aplDept;
     @Column(name="pr_no")
     protected String prNo;
+    @Column(name="erp_code")
+    protected String erpCode;
 
     @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd")
     @Column(name="pr_apl_date")
@@ -212,6 +214,13 @@ public class ProcurementRequisitionMain {
         this.poCode = poCode;
     }
 
+    public String getErpCode() {
+        return erpCode;
+    }
+
+    public void setErpCode(String erpCode) {
+        this.erpCode = erpCode;
+    }
 
     @Override
     public String toString() {

@@ -70,8 +70,8 @@ public class ProcurementRequisitionService {
                         String sql = "INSERT INTO [dbo].[pr_main]" +
                                 "(pr_title, apl_user_name, apl_user_ssn, cost_center, " +
                                 "apl_dept, pr_no, pr_apl_date, pr_apl_update_date, " +
-                                "project_name, pr_status, pr_process, pr_pass,flow_type) " +
-                                "values(?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                                "project_name, pr_status, pr_process, pr_pass,flow_type,erp_code) " +
+                                "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
                         PreparedStatement statement = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
@@ -88,6 +88,7 @@ public class ProcurementRequisitionService {
                         statement.setString(11, "");
                         statement.setString(12, "");
                         statement.setString(13, flowTypeObject.get("flow_type").getAsString());
+                        statement.setString(14,flowTypeObject.get("erpCode") == null ? "" : flowTypeObject.get("erpCode").getAsString());
 
                         return statement;
                     }

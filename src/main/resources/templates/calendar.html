@@ -71,7 +71,7 @@
                 if (date.getDay() === 6 || date.getDay() === 0) {
                     $(element).css('background-color', 'pink');
                     $(element).css('border-radius', '15px');
-                };
+                }
 
                 if(circleDateTime[0].indexOf(date.getTime()) >= 0){
                     let index = circleDateTime[0].indexOf(date.getTime());
@@ -86,11 +86,8 @@
 
                     }
                 }
-
             }
         });
-
-
     })
 
     function ajax_get_holiday(year) {

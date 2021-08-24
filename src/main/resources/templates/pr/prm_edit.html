@@ -66,46 +66,74 @@
             <div th:if="${prm.flowType != 'RM_ASSEMBLY_MRO'} ">
                 <div th:switch="${prm.flowType}" class="row">
                     <div th:case="'EXPENSE'" class="col-sm form-group">
-                        <div class="form-group">
-                            <label th:text="#{pr.cost.type} + ':'" for="f_projectName"></label>
-                            <i class='fa fa-asterisk'
-                               style='color: red;font-size: 0.5rem; '></i>
-                             <input type="text" class="form-control" th:field="*{projectName}" id="f_projectName" readonly>
-                            <!--<select class="form-control" name="projectName" id="f_projectName" th:field="*{projectName}">
-                                <option value="">Select a type</option>
-                                <option th:each="ct : ${cts}"
-                                        th:selected="${ct.costType == prm.projectName}"
-                                        th:value="${ct.costType}"
-                                        th:text="${ct.costType + '&#45;&#45;' + ct.erpCode}"
-                                        th:data-erp="${ct.erpCode}">
-                                </option>
-                            </select>-->
+                        <div class="row">
+                            <div class="col-sm form-group">
+                                <div class="form-group">
+                                    <label th:text="#{pr.cost.type} + ':'" for="f_projectName"></label>
+                                    <i class='fa fa-asterisk'
+                                       style='color: red;font-size: 0.5rem; '></i>
+                                    <input type="text" class="form-control" th:field="*{projectName}" id="f_projectName"
+                                           readonly>
+                                    <!--<select class="form-control" name="projectName" id="f_projectName" th:field="*{projectName}">
+                                        <option value="">Select a type</option>
+                                        <option th:each="ct : ${cts}"
+                                                th:selected="${ct.costType == prm.projectName}"
+                                                th:value="${ct.costType}"
+                                                th:text="${ct.costType + '&#45;&#45;' + ct.erpCode}"
+                                                th:data-erp="${ct.erpCode}">
+                                        </option>
+                                    </select>-->
 
+                                </div>
+                            </div>
+                            <div class="col-sm form-group">
+                                <div class="form-group">
+                                    <label th:text="#{pr.erp.code} + ':'" for="f_erpCode"></label>
+                                    <input type="text" class="form-control" th:field="*{erpCode}" id="f_erpCode"
+                                           readonly>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                     <div th:case="'CAPITALIZED_PROJECT_FIXED_ASSET'" class="col-sm form-group">
-                        <div class="form-group">
-                            <label th:text="#{pr.project.name} + ':'" for="f_projectName"></label>
-                            <i class='fa fa-asterisk'
-                               style='color: red;font-size: 0.5rem; '></i>
-                            <input type="text" class="form-control" th:field="*{projectName}" id="f_projectName" readonly>
-                            <!--<select class="form-control" name="projectName" id="f_projectName" th:field="*{projectName}" >
-                                <option value="">Select a project</option>
-                                <option th:each="pp : ${pps}"
-                                        th:selected="${pp.projectName == prm.projectName}"
-                                        th:value="${pp.projectName}"
-                                        th:text="${pp.projectName + '&#45;&#45;' + pp.erpCode}"
-                                        th:data-erp="${pp.erpCode}">
-                                </option>
-                            </select>-->
+                        <div class="row">
+                            <div class="col-sm form-group">
+                                <div class="form-group">
+                                    <label th:text="#{pr.project.name} + ':'" for="f_projectName"></label>
+                                    <i class='fa fa-asterisk'
+                                       style='color: red;font-size: 0.5rem; '></i>
+                                    <input type="text" class="form-control" th:field="*{projectName}"
+                                           id="f_projectName"
+                                           readonly>
+                                    <!--<select class="form-control" name="projectName" id="f_projectName" th:field="*{projectName}" >
+                                        <option value="">Select a project</option>
+                                        <option th:each="pp : ${pps}"
+                                                th:selected="${pp.projectName == prm.projectName}"
+                                                th:value="${pp.projectName}"
+                                                th:text="${pp.projectName + '&#45;&#45;' + pp.erpCode}"
+                                                th:data-erp="${pp.erpCode}">
+                                        </option>
+                                    </select>-->
+
+                                </div>
+                            </div>
+                            <div class="col-sm form-group">
+                                <div class="form-group">
+                                    <label th:text="#{pr.erp.code} + ':'" for="f_erpCode"></label>
+                                    <input type="text" class="form-control" th:field="*{erpCode}" id="f_erpCode"
+                                           readonly>
+                                </div>
+                            </div>
 
                         </div>
+
                     </div>
                 </div>
-<!--
-                <div class="col-sm form-group">
-                    <span id="erp_code"></span>
-                </div>-->
+                <!--
+                                <div class="col-sm form-group">
+                                    <span id="erp_code"></span>
+                                </div>-->
 
             </div>
             <div class="row">
@@ -127,7 +155,8 @@
             <div th:if="${prm.flowType == 'RM_ASSEMBLY_MRO' }">
                 <button type="button" class="btn btn-sm btn-primary mr-2" id="prd_upload"
                         th:text="#{pr.upload.prd.file}"></button>
-                <a th:href="${templateUrl}" type="button" class="btn btn-sm btn-info mr-2" id="template_download" download
+                <a th:href="${templateUrl}" type="button" class="btn btn-sm btn-info mr-2" id="template_download"
+                   download
                    th:text="#{pr.download.prd.temp.file}"></a>
             </div>
 
@@ -271,25 +300,25 @@
     $(document).ready(function () {
 
 
-        $("#f_projectName").change(function (e){
+        $("#f_projectName").change(function (e) {
             const selected = $(this).find('option:selected');
             const erp = selected.data('erp');
 
-/*            if(!($(this).val() === "")){
-                $("#erp_code").text(erp);
-            }*/
+            /*            if(!($(this).val() === "")){
+                            $("#erp_code").text(erp);
+                        }*/
         })
 
-        $("#f_costCenter").change(function (e){
+        $("#f_costCenter").change(function (e) {
             const selected = $(this).find('option:selected');
             const dept = selected.data('desc');
 
-            if(!($(this).val() === "")){
+            if (!($(this).val() === "")) {
                 $("#f_aplDept").val(dept);
             }
 
             let flow_type = $("#f_flowType").val();
-            if(flow_type === "EXPENSE"){
+            if (flow_type === "EXPENSE") {
                 const costcenter = $("#f_costCenter").val();
                 ajax_getCostTypeByCostcenter(costcenter);
             }
@@ -299,7 +328,7 @@
         $("#btn_prm_update").click(function (e) {
             e.preventDefault();
             const valid = verification();
-            if (valid === true){
+            if (valid === true) {
                 let id = $("#f_prm_id").val();
                 ajax_prm_update(id);
             }
@@ -308,17 +337,21 @@
         $("#prd_add").click(function (e) {
             e.preventDefault();
 
-            const flow_type= $("#f_flowType").val();
-            switch (flow_type){
+            const flow_type = $("#f_flowType").val();
+            switch (flow_type) {
                 case "RM_ASSEMBLY_MRO":
                     ajax_getPrdNewForm($("#f_prm_id").val(), "null");
                     break;
                 case "EXPENSE":
-                    const erp1 = $("#f_projectName option:selected").data("erp")
+                    // const erp1 = $("#f_projectName option:selected").data("erp")
+                    const erp1 = $("#f_erpCode").val();
+                    //alert(erp1);
                     ajax_getPrdNewForm($("#f_prm_id").val(), erp1);
                     break;
                 case "CAPITALIZED_PROJECT_FIXED_ASSET":
-                    const erp2 = $("#f_projectName option:selected").data("erp")
+                    //const erp2 = $("#f_projectName option:selected").data("erp")
+                    const erp2 = $("#f_erpCode").val();
+                    //alert(erp2);
                     ajax_getPrdNewForm($("#f_prm_id").val(), erp2);
                     break;
             }
@@ -328,8 +361,8 @@
             e.preventDefault();
             let id = $(this).parent("td").find(".id").text();
 
-            const flow_type= $("#f_flowType").val();
-            switch (flow_type){
+            const flow_type = $("#f_flowType").val();
+            switch (flow_type) {
                 case "RM_ASSEMBLY_MRO":
                     ajax_getPrdEditForm(id, "null");
                     break;
@@ -364,22 +397,22 @@
             $("#btn_prm_update").trigger("click");
 
             const valid = verification();
-            if (valid === false){
+            if (valid === false) {
                 return false;
             }
-            const flow_type= $("#f_flowType").val();
-            if (flow_type === "RM_ASSEMBLY_MRO"){
+            const flow_type = $("#f_flowType").val();
+            if (flow_type === "RM_ASSEMBLY_MRO") {
                 let num = $(".l_erpCode").length;
-                if (num === 0){
+                if (num === 0) {
                     return false;
-                }else {
-                    for (let i=0;i<num;i++){
+                } else {
+                    for (let i = 0; i < num; i++) {
                         let erpCode = $(".l_erpCode")[i].innerText;
                         let infor_api_url = $("#infor_api_url").val();
                         let num = ajax_countItemByErpCode(infor_api_url, erpCode);
                         //alert(num);
-                        if (num === "0"){
-                            show_mes("msg","ERP code: " + erpCode + " is not existing in ERP, Please check it.", true);
+                        if (num === "0") {
+                            show_mes("msg", "ERP code: " + erpCode + " is not existing in ERP, Please check it.", true);
                             return false;
                         }
                     }
@@ -398,18 +431,18 @@
         let input_len = $("input").length;
         let select_len = $("select").length;
 
-        for (let i=0; i< input_len; i++){
-            if ($.trim($("input")[i].value) === ""){
+        for (let i = 0; i < input_len; i++) {
+            if ($.trim($("input")[i].value) === "") {
                 result = false;
-                show_mes("msg", [[#{page.input.required}]],true);
+                show_mes("msg", [[#{page.input.required}]], true);
                 break;
             }
         }
 
-        for (let i=0; i< select_len; i++){
-            if ($.trim($("select")[i].value) === ""){
+        for (let i = 0; i < select_len; i++) {
+            if ($.trim($("select")[i].value) === "") {
                 result = false;
-                show_mes("msg",[[#{page.input.required}]],true);
+                show_mes("msg", [[#{page.input.required}]], true);
                 break;
             }
         }
@@ -417,7 +450,7 @@
         return result;
     };
 
-    function ajax_getPrdEditForm(id,erpCode) {
+    function ajax_getPrdEditForm(id, erpCode) {
         $.ajax({
             type: "GET",
             contentType: "text/html",
@@ -433,7 +466,7 @@
         })
     }
 
-    function ajax_getPrdNewForm(id,erp_code) {
+    function ajax_getPrdNewForm(id, erp_code) {
         $.ajax({
             type: "GET",
             contentType: "text/html",
@@ -540,12 +573,12 @@
         })
     }
 
-    function ajax_countItemByErpCode(infor_api_url, erpCode){
+    function ajax_countItemByErpCode(infor_api_url, erpCode) {
         let num = "";
         $.ajax({
             type: "GET",
             contentType: "application/json",
-            url: infor_api_url+"/api/count/" + erpCode,
+            url: infor_api_url + "/api/count/" + erpCode,
             dataType: 'text',
             cache: false,
             async: false,
@@ -556,7 +589,7 @@
         return num;
     }
 
-    function ajax_getCostTypeByCostcenter(costcenter){
+    function ajax_getCostTypeByCostcenter(costcenter) {
         $.ajax({
             type: "GET",
             contentType: "application/json",
@@ -567,10 +600,10 @@
             success: function (data) {
                 let $el = $("#f_projectName");
                 $el.empty();
-                $el.append($('<option></option>').text("Select a type").attr('value',''));
-                if(data.length > 0){
-                    $.each(data,function (index){
-                        $el.append($('<option></option>').attr('value', data[index]['costType']).attr('data-erp',data[index]['erpCode']).text(
+                $el.append($('<option></option>').text("Select a type").attr('value', ''));
+                if (data.length > 0) {
+                    $.each(data, function (index) {
+                        $el.append($('<option></option>').attr('value', data[index]['costType']).attr('data-erp', data[index]['erpCode']).text(
                             data[index]['costType'] + "--" + data[index]['erpCode']))
                     })
                 }

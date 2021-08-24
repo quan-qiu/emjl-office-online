@@ -135,8 +135,12 @@
 
 
     function ajax_submit(){
-        const json_formData = $('#f_flow_type').serializeArray()
+        let json_formData = $('#f_flow_type').serializeArray()
             .reduce(function(a, x) { a[x.name] = x.value; return a; }, {});
+
+        if ($("#flow_type").val() !== "RM_ASSEMBLY_MRO"){
+            json_formData["erpCode"]= $("#projectName").find("option:selected").attr('data-erp');
+        }
 
         //alert(JSON.stringify(json_formData));
 
@@ -189,7 +193,7 @@
                 $el.append($('<option></option>').text("Select a type").attr('value',''));
                 if(data.length > 0){
                     $.each(data,function (index){
-                        $el.append($('<option></option>').attr('value', data[index]['costType']).attr('data-erp',data[index]['erpCode']).text(
+                        $el.append($('<option></option>').attr('value', data[index]['costType']).attr('data-erp',$.trim(data[index]['erpCode'])).text(
                             data[index]['costType'] + "--" + data[index]['erpCode']))
                     })
                 }
