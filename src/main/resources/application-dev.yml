@@ -29,7 +29,7 @@ spring:
       enabled: true
       file-size-threshold: 2KB
   datasource:
-    password: Euromisijx89@#
+    password: password
     url: jdbc:sqlserver://172.16.200.217;databaseName=gateway_dev
     username: sa
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
