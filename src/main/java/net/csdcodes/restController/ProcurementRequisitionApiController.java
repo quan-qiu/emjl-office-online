@@ -141,10 +141,12 @@ public class ProcurementRequisitionApiController {
 
     @PostMapping("/prd/loadFromFile/{filename:.+}/{prmId}")
     public String loadPRDFromFile(@PathVariable String filename, @PathVariable int prmId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
+        User thisUser = userService.getUserByUsername(auth.getName());
         try{
             //storageService.loadPRDFromFile(filename, prmId);
-            storageService.ApachePOIExcelReadPRDFile(filename,prmId);
+            storageService.ApachePOIExcelReadPRDFile(filename,prmId,thisUser.getSsn().trim());
         }catch (IOException | ParseException e){
             System.out.println(e.getStackTrace());
         }

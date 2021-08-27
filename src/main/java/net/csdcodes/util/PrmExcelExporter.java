@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
+import net.csdcodes.model.PrMainDetail;
 import net.csdcodes.model.ProcurementRequisitionMain;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -17,10 +18,10 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class PrmExcelExporter {
     private XSSFWorkbook workbook;
     private XSSFSheet sheet;
-    private List<ProcurementRequisitionMain> listPrms;
+    private List<PrMainDetail> listPrmds;
 
-    public PrmExcelExporter(List<ProcurementRequisitionMain> listPrms) {
-        this.listPrms = listPrms;
+    public PrmExcelExporter(List<PrMainDetail> listPrmds) {
+        this.listPrmds = listPrmds;
         workbook = new XSSFWorkbook();
     }
 
@@ -49,6 +50,13 @@ public class PrmExcelExporter {
         createCell(row, 10, "Finished", style);
         createCell(row, 11, "Approved", style);
         createCell(row, 12, "Submitted", style);
+        createCell(row, 13, "ERP Code", style);
+        createCell(row, 14, "ERP desc", style);
+        createCell(row, 15, "ERP brand size", style);
+        createCell(row, 16, "Quantity", style);
+        createCell(row, 17, "ERP unit", style);
+        createCell(row, 18, "Cost", style);
+        createCell(row, 19, "Memo", style);
     }
 
     private void createCell(Row row, int columnCount, Object value, CellStyle style) {
@@ -58,6 +66,8 @@ public class PrmExcelExporter {
             cell.setCellValue((Integer) value);
         } else if (value instanceof Boolean) {
             cell.setCellValue((Boolean) value);
+        } else if (value instanceof Float) {
+            cell.setCellValue((Float) value);
         }else {
             cell.setCellValue((String) value);
         }
@@ -72,24 +82,30 @@ public class PrmExcelExporter {
         font.setFontHeight(14);
         style.setFont(font);
 
-        for (ProcurementRequisitionMain prm : listPrms) {
+        for (PrMainDetail prmd : listPrmds) {
             Row row = sheet.createRow(rowCount++);
             int columnCount = 0;
 
-            createCell(row, columnCount++, prm.getPrTitle(), style);
-            createCell(row, columnCount++, prm.getPoCode(), style);
-            createCell(row, columnCount++, prm.getAplUserName(), style);
-            createCell(row, columnCount++, prm.getAplUserSsn(), style);
-            createCell(row, columnCount++, prm.getCostCenter(), style);
-            createCell(row, columnCount++, prm.getAplDept(), style);
-            createCell(row, columnCount++, prm.getPrNo(), style);
-            createCell(row, columnCount++, prm.getPoCode(), style);
-            createCell(row, columnCount++, prm.getPrAplDate().toString(), style);
-            createCell(row, columnCount++, prm.getProjectName(), style);
-            createCell(row, columnCount++, prm.getFlowType(), style);
-            createCell(row, columnCount++, prm.getFinished(), style);
-            createCell(row, columnCount++, prm.getApproved(), style);
-            createCell(row, columnCount++, prm.getSubmitted(), style);
+            createCell(row, columnCount++, prmd.getPrm().getPrTitle(), style);
+            createCell(row, columnCount++, prmd.getPrm().getPoCode(), style);
+            createCell(row, columnCount++, prmd.getPrm().getAplUserName(), style);
+            createCell(row, columnCount++, prmd.getPrm().getAplUserSsn(), style);
+            createCell(row, columnCount++, prmd.getPrm().getCostCenter(), style);
+            createCell(row, columnCount++, prmd.getPrm().getAplDept(), style);
+            createCell(row, columnCount++, prmd.getPrm().getPrNo(), style);
+            createCell(row, columnCount++, prmd.getPrm().getPoCode(), style);
+            createCell(row, columnCount++, prmd.getPrm().getPrAplDate().toString(), style);
+            createCell(row, columnCount++, prmd.getPrm().getProjectName(), style);
+            createCell(row, columnCount++, prmd.getPrm().getFlowType(), style);
+            createCell(row, columnCount++, prmd.getPrm().getFinished(), style);
+            createCell(row, columnCount++, prmd.getPrm().getApproved(), style);
+            createCell(row, columnCount++, prmd.getPrd().getItemErpCode(), style);
+            createCell(row, columnCount++, prmd.getPrd().getItemErpDesc(), style);
+            createCell(row, columnCount++, prmd.getPrd().getItemErpBrandSize(), style);
+            createCell(row, columnCount++, prmd.getPrd().getQty(), style);
+            createCell(row, columnCount++, prmd.getPrd().getItemErpUnit(), style);
+            createCell(row, columnCount++, prmd.getPrd().getEstCost(), style);
+            createCell(row, columnCount++, prmd.getPrd().getMemo(), style);
         }
     }
 

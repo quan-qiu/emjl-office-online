@@ -16,12 +16,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @CrossOrigin(origins = "http://localhost:8080")
 public class FileUploadApiController {
 
-    private final StorageService storageService;
+   /* private final StorageService storageService;
 
     @Autowired
     public FileUploadApiController(StorageService storageService) {
         this.storageService = storageService;
-    }
+    }*/
+    @Autowired
+    StorageService storageService;
 
     @GetMapping("/files/{filename:.+}")
     @ResponseBody

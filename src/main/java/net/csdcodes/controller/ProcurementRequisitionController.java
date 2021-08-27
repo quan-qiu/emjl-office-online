@@ -304,8 +304,23 @@ public class ProcurementRequisitionController {
         PRMRequestVariables prmrv = new PRMRequestVariables(completed,agreed,1,start,end,poCode,flowType);
 
         List<ProcurementRequisitionMain> prms = prs.getPRMHistory(prmrv);
+        Iterator<ProcurementRequisitionMain> ittPrm = prms.iterator();
+        List<PrMainDetail> prmds = new ArrayList<>();
 
-        PrmExcelExporter excelExporter = new PrmExcelExporter(prms);
+        while (ittPrm.hasNext()){
+            ProcurementRequisitionMain prm = ittPrm.next();
+            List<ProcurementRequisitionDetail> prds = prs.getPRDetailsByPRMId(prm.getId());
+            Iterator<ProcurementRequisitionDetail> ittPrd = prds.iterator();
+            while (ittPrd.hasNext()){
+                PrMainDetail prMainDetail = new PrMainDetail();
+                ProcurementRequisitionDetail prd = ittPrd.next();
+                prMainDetail.setPrm(prm);
+                prMainDetail.setPrd(prd);
+                prmds.add(prMainDetail);
+            }
+        }
+
+        PrmExcelExporter excelExporter = new PrmExcelExporter(prmds);
         excelExporter.export(response);
 
     }
