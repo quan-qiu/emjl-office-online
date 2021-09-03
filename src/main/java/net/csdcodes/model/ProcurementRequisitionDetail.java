@@ -13,6 +13,7 @@ public class ProcurementRequisitionDetail {
     @GeneratedValue(strategy= GenerationType.AUTO)
     @Column(name="id")
     protected int id;
+
     @Column(name="pr_main_id")
     protected int prMainId;
     @Column(name="item_erp_code")
@@ -42,6 +43,9 @@ public class ProcurementRequisitionDetail {
 
     @Column(name = "memo")
     protected String memo;
+
+    @Column(name="po_code")
+    protected String poCode;
 
     protected float totalEstCost;
 
@@ -149,6 +153,14 @@ public class ProcurementRequisitionDetail {
         this.memo = memo;
     }
 
+    public String getPoCode() {
+        return poCode;
+    }
+
+    public void setPoCode(String poCode) {
+        this.poCode = poCode;
+    }
+
     @Override
     public String toString() {
         return "ProcurementRequisitionDetail{" +
@@ -163,6 +175,8 @@ public class ProcurementRequisitionDetail {
                 ", createdDate=" + createdDate +
                 ", updatedDate=" + updatedDate +
                 ", targetDate=" + targetDate +
+                ", memo='" + memo + '\'' +
+                ", poCode='" + poCode + '\'' +
                 ", totalEstCost=" + totalEstCost +
                 '}';
     }

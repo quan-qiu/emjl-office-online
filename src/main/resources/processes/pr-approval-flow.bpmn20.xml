@@ -30,8 +30,15 @@
             </conditionExpression>
         </sequenceFlow>
 
-        <userTask id="managerApproveTask" name="Manager approval" flowable:assignee="${managerSsn}"
-                     flowable:class="net.csdcodes.handler.PrProcessApprovalHandler"/>
+       <!-- <userTask id="managerApproveTask" name="Manager approval" flowable:assignee="${managerSsn}"
+                     flowable:class="net.csdcodes.handler.PrProcessApprovalHandler"/>-->
+        <userTask id="managerApproveTask" name="Manager approval" flowable:assignee="${assignee}"
+                  flowable:class="net.csdcodes.handler.PrProcessApprovalHandler">
+            <multiInstanceLoopCharacteristics isSequential="false">
+                <loopDataInputRef>managerSsn</loopDataInputRef>
+                <inputDataItem name="assignee" />
+            </multiInstanceLoopCharacteristics>
+        </userTask>
         <sequenceFlow sourceRef="managerApproveTask" targetRef="managerDecision"/>
 
         <exclusiveGateway id="managerDecision"/>

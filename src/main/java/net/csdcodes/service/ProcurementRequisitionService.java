@@ -337,8 +337,8 @@ public class ProcurementRequisitionService {
                     @Override
                     public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                         String sql = "INSERT INTO [dbo].[pr_comment] " +
-                                "(pr_main_id, userssn, user_org_name, created_date, comment, approved) " +
-                                "values(?,?,?,?,?,?)";
+                                "(pr_main_id, userssn, user_org_name, created_date, comment, approved,gate) " +
+                                "values(?,?,?,?,?,?,?)";
 
                         PreparedStatement statement = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
@@ -348,7 +348,7 @@ public class ProcurementRequisitionService {
                         statement.setString(4, DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.SIMPLIFIED_CHINESE).format(now));
                         statement.setString(5, prc.getComment());
                         statement.setInt(6, prc.getApproved());
-
+                        statement.setString(7, prc.getGate());
                         return statement;
                     }
                 }, keyHolder);
@@ -573,6 +573,20 @@ public class ProcurementRequisitionService {
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
+
+        return result;
+    }
+
+    public int prdFillPoCodeByPrdId( String poCode, int prdId){
+        LocalDateTime now = LocalDateTime.now();
+        String pattern = "yyyy-MM-dd";
+
+        int result = jdbcTemplate.update("UPDATE [dbo].[pr_detail] set" +
+                        " po_code=? , updated_date=?" +
+                        " where id=?",
+                new Object[]{poCode,
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.SIMPLIFIED_CHINESE).format(now),
+                        prdId});
 
         return result;
     }

@@ -242,4 +242,11 @@ public class ProcurementRequisitionApiController {
         }
 
     }
+
+    @PostMapping("/prd/pocode/{prdId}/{poCode}")
+    public ResponseEntity prdFillPoCodeByPrdId(@PathVariable int prdId, @PathVariable String poCode){
+        int result = prs.prdFillPoCodeByPrdId(poCode,prdId);
+
+        return new ResponseEntity(result,HttpStatus.OK);
+    }
 }

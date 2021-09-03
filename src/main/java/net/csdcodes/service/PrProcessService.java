@@ -1,6 +1,8 @@
 package net.csdcodes.service;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import net.csdcodes.model.ProcessInstanceResponse;
 import net.csdcodes.model.ProcurementRequisitionMain;
 
@@ -21,6 +23,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Type;
 import java.util.*;
 
 @Service
@@ -71,6 +74,9 @@ public class PrProcessService {
         throws FlowableException, FlowableObjectNotFoundException{
         //System.out.println("initiating new process in Flowable workflow for PR for user " + thisUser.getOrgName());
 
+        Type listType = new TypeToken<List<String>>() {}.getType();
+        List<String> assignees =  new Gson().fromJson(variablesObj.get("managerSsn"),listType);
+
         Map<String, Object> variables = new HashMap<>();
         variables.put("mainId", variablesObj.get("mainId").getAsString());
         variables.put("dept", variablesObj.get("dept").getAsString());
@@ -81,7 +87,10 @@ public class PrProcessService {
         variables.put("curtAssignee",TASK_AUDITOR_GROUP);
         variables.put("nextAssignee",TASK_MANAGER_GROUP);
         variables.put("approved","Pending");
-        variables.put("managerSsn",variablesObj.get("managerSsn").getAsString());
+        //variables.put("managerSsn",variablesObj.get("managerSsn").getAsString());
+        variables.put("managerSsn",assignees);
+
+            System.out.println("ProcessInstanceResponse variables : " + variables.toString());
 
         ProcessInstance processInstance =
                 runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, variables);
@@ -101,6 +110,7 @@ public class PrProcessService {
     }
 
     public Task getTaskByPrmId(int prmId){
+        System.out.println("Task getTaskByPrmId : " + prmId ) ;
         Task task = taskService.createTaskQuery().processVariableValueEquals("mainId", String.valueOf(prmId)).singleResult();
 
         if (task != null){
@@ -109,6 +119,36 @@ public class PrProcessService {
             return null;
         }
 
+    }
+
+    public Task getTaskByPrmIdAndAssignee(int prmId,String assignee){
+        System.out.println("Task getTaskByPrmId : " + prmId ) ;
+        Task task = taskService.createTaskQuery()
+                .processVariableValueEquals("mainId", String.valueOf(prmId))
+                .taskAssignee(assignee)
+                .singleResult();
+
+        if (task != null){
+            return task;
+        }else{
+            return null;
+        }
+
+    }
+
+    public int countTaskByPrmId(int prmId){
+        System.out.println("Task getTaskByPrmId : " + prmId ) ;
+
+        return (int) taskService
+                .createTaskQuery()
+                .processVariableValueEquals("mainId", String.valueOf(prmId))
+                .count();
+
+    }
+
+    public String getAssigneeOfTask(String taskId){
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        return task.getAssignee();
     }
 
     public ProcessInstance getProcessInstanceByPrmId(String prmId){

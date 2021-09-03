@@ -43,20 +43,20 @@ public class PrmExcelExporter {
         createCell(row, 3, "Cost Center", style);
         createCell(row, 4, "Apply Dept", style);
         createCell(row, 5, "PR NO.", style);
-        createCell(row, 6, "PO Code", style);
-        createCell(row, 7, "Apply Date", style);
-        createCell(row, 8, "Project Name", style);
-        createCell(row, 9, "Flow Type", style);
-        createCell(row, 10, "Finished", style);
-        createCell(row, 11, "Approved", style);
-        createCell(row, 12, "Submitted", style);
-        createCell(row, 13, "ERP Code", style);
-        createCell(row, 14, "ERP desc", style);
-        createCell(row, 15, "ERP brand size", style);
-        createCell(row, 16, "Quantity", style);
-        createCell(row, 17, "ERP unit", style);
-        createCell(row, 18, "Cost", style);
-        createCell(row, 19, "Memo", style);
+        createCell(row, 6, "Apply Date", style);
+        createCell(row, 7, "Project Name", style);
+        createCell(row, 8, "Flow Type", style);
+        createCell(row, 9, "Finished", style);
+        createCell(row, 10, "Approved", style);
+        createCell(row, 11, "Submitted", style);
+        createCell(row, 12, "ERP Code", style);
+        createCell(row, 13, "ERP desc", style);
+        createCell(row, 14, "ERP brand size", style);
+        createCell(row, 15, "Quantity", style);
+        createCell(row, 16, "ERP unit", style);
+        createCell(row, 17, "Cost", style);
+        createCell(row, 18, "Memo", style);
+        createCell(row, 19, "PO Code", style);
     }
 
     private void createCell(Row row, int columnCount, Object value, CellStyle style) {
@@ -93,12 +93,12 @@ public class PrmExcelExporter {
             createCell(row, columnCount++, prmd.getPrm().getCostCenter(), style);
             createCell(row, columnCount++, prmd.getPrm().getAplDept(), style);
             createCell(row, columnCount++, prmd.getPrm().getPrNo(), style);
-            createCell(row, columnCount++, prmd.getPrm().getPoCode(), style);
             createCell(row, columnCount++, prmd.getPrm().getPrAplDate().toString(), style);
             createCell(row, columnCount++, prmd.getPrm().getProjectName(), style);
             createCell(row, columnCount++, prmd.getPrm().getFlowType(), style);
             createCell(row, columnCount++, prmd.getPrm().getFinished(), style);
             createCell(row, columnCount++, prmd.getPrm().getApproved(), style);
+
             createCell(row, columnCount++, prmd.getPrd().getItemErpCode(), style);
             createCell(row, columnCount++, prmd.getPrd().getItemErpDesc(), style);
             createCell(row, columnCount++, prmd.getPrd().getItemErpBrandSize(), style);
@@ -106,6 +106,7 @@ public class PrmExcelExporter {
             createCell(row, columnCount++, prmd.getPrd().getItemErpUnit(), style);
             createCell(row, columnCount++, prmd.getPrd().getEstCost(), style);
             createCell(row, columnCount++, prmd.getPrd().getMemo(), style);
+            createCell(row, columnCount++, prmd.getPrd().getPoCode(), style);
         }
     }
 

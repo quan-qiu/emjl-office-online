@@ -19,10 +19,10 @@
                     <option th:each="type:${flow_type}" th:text="${type}"></option>
                 </select>
             </div>
-            <div class="col-sm form-group mx-2 my-2">
+<!--            <div class="col-sm form-group mx-2 my-2">
                 <label for="poCode" th:text="#{pr.prm.pocode}"></label>
                 <input class="form-control" type="text" id="poCode" name="poCode">
-            </div>
+            </div>--><input class="form-control" type="text" id="poCode" name="poCode" hidden>
             <div class="col-sm form-group mx-2 my-2">
                 <label for="pr_start" th:text="#{pr.apl.start.date}"></label>
                 <div class="form-group input-group" id="pr_start">

@@ -113,18 +113,35 @@ public class ProcurementRequisitionController {
         return "pr/prm_edit";
     }
 
-    @GetMapping("/prm/read/{prmId}/{assignee}")
-    public String readPRMById(@PathVariable int prmId,@PathVariable String assignee,
+    @GetMapping("/prm/read/{prmId}/{assignee}/{taskName}")
+    public String readPRMById(@PathVariable int prmId,@PathVariable String assignee,@PathVariable String taskName,
                               Model model){
-        Task task = prProcessService.getTaskByPrmId(prmId);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User thisUser = userService.getUserByUsername(auth.getName());
+        Task task = null;
+        if (assignee.equals("PR-MANAGER")){
+            task = prProcessService.getTaskByPrmIdAndAssignee(prmId,thisUser.getSsn().trim());
+        }else{
+            task = prProcessService.getTaskByPrmId(prmId);
+        }
+
         if (null != task){
 
             String taskId = task.getId();
 
             Map<String, Object> variables= prProcessService.getTaskInstanceVariable(taskId);
 
-            if(!assignee.equals(variables.get("curtAssignee"))){
-                return "redirect:/pr/prm/history/" + prmId ;
+            if (assignee.equals("PR-MANAGER")){
+
+                String assigneeInFlow = task.getAssignee();
+                if(!assigneeInFlow.equals(thisUser.getSsn().trim())){
+                    return "redirect:/pr/prm/history/" + prmId ;
+                }
+            }else {
+                if(!assignee.equals(variables.get("curtAssignee"))){
+                    return "redirect:/pr/prm/history/" + prmId ;
+                }
+
             }
 
             model.addAttribute("taskId", taskId);
@@ -132,7 +149,7 @@ public class ProcurementRequisitionController {
             model.addAttribute("nextAssignee", variables.get("nextAssignee"));
             model.addAttribute("managerSsn", variables.get("managerSsn"));
             model.addAttribute("orgName", variables.get("orgName"));
-
+            model.addAttribute("taskName", taskName);
 
         }else{
 
@@ -150,7 +167,7 @@ public class ProcurementRequisitionController {
         model.addAttribute("prm", prm);
         model.addAttribute("prcs", prComments);
         model.addAttribute("userSsn", prm.getAplUserSsn());
-
+        model.addAttribute("taskName", taskName);
         return "pr/prm_readonly";
     }
 

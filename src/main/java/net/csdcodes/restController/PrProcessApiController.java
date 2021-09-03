@@ -69,7 +69,7 @@ public class PrProcessApiController {
             if(null == taskInfo.getTaskDefinitionId()){
                 System.out.println("TaskId can't be null to complete a userTask");
             }
-            prProcessService.completeUseerTask(taskInfo);
+            prProcessService.completeUserTask(taskInfo);
         }
         catch (FlowableObjectNotFoundException flw){
             System.out.println("TaskId doesn't exists");
@@ -164,5 +164,12 @@ public class PrProcessApiController {
             return new ResponseEntity<>(task.getName(),HttpStatus.OK);
         else
         return new ResponseEntity<>("Couldn't find",HttpStatus.OK);
+    }
+
+    @GetMapping("/task/count/{prmId}")
+    public ResponseEntity<?> countTaskByPrmId(@PathVariable int prmId){
+        int num = prProcessService.countTaskByPrmId(prmId);
+
+        return new ResponseEntity<>(num, HttpStatus.OK);
     }
 }

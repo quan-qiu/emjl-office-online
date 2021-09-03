@@ -22,8 +22,8 @@
                     <input th:value="${nextAssignee}" id="f_next_assignee" hidden>
                     <input th:value="${userSsn}" id="f_userSsn" hidden>
                     <input th:value="${managerSsn}" id="f_managerSsn" hidden>
-                    <input type="text" class="form-control w-100" th:value="${prm.id}" id="f_prm_id" hidden>
-                    <input type="text" class="form-control w-100" th:value="${prm.prTitle}" id="f_prTitle">
+                    <input type="text" class="form-control" th:value="${prm.id}" id="f_prm_id" hidden>
+                    <input type="text" class="form-control" th:value="${prm.prTitle}" id="f_prTitle" readonly>
                 </div>
             </td>
 
@@ -36,10 +36,6 @@
                 <h6 th:text="${prm.flowType}"></h6>
             </td>
 
-            <td class="text-left">
-                <strong><label th:text="#{pr.apl.username} + ':'"></label></strong>
-                <h6 th:text="${orgName}"></h6>
-            </td>
         </tr>
         <tr>
             <td class="text-left">
@@ -55,7 +51,7 @@
                 <strong><label th:text="#{pr.project.name} + ':'"></label></strong>
                 <h6 th:text="${prm.projectName}"/>
             </td>
-            <td class="text-left">
+<!--            <td class="text-left">
                 <strong><label th:text="#{pr.status.completed} + ':'"></label></strong>
                 <h6 th:text="${prm.finished==1} ? #{pr.status.completed}:#{pr.status.pending}"/>
                 <span th:if="${prm.finished==1}">
@@ -64,10 +60,10 @@
                 <span th:if="${prm.finished==0}">
                         <b><i class="fa fa-times fa-lg" style='color: red '></i></b>
                     </span>
-            </td>
+            </td>-->
         </tr>
         <tr>
-            <td class="text-left">
+<!--            <td class="text-left">
                 <strong><label th:text="#{pr.approve.agreed} + ':'"></label></strong>
                 <h6 th:text="${prm.approved==1}? #{pr.approve.agreed}:#{pr.approve.rejected}"/>
                 <span th:if="${prm.approved==1}">
@@ -76,11 +72,11 @@
                 <span th:if="${prm.approved==0}">
                         <b><i class="fa fa-times fa-lg" style='color: red '></i></b>
                     </span>
-            </td>
-            <td>
+            </td>-->
+<!--            <td>
                 <strong><label th:text="#{pr.prm.pocode} + ':'"></label></strong>
                 <h6 th:text="${prm.poCode}"/>
-            </td>
+            </td>-->
             <td>
                 <strong><label th:text="#{pr.apl.creation.date} + ':'"></label></strong>
                 <h6 th:text="${#dates.format(prm.prAplDate,'yyyy-MM-dd')}"/>
@@ -90,8 +86,12 @@
                 <strong><label th:text="#{pr.prm.total.estcost} + ':'"></label></strong>
                 <h6 th:text="${prm.totalEstCost}"/>
             </td>
+            <td class="text-left">
+                <strong><label th:text="#{pr.apl.username} + ':'"></label></strong>
+                <h6 th:text="${orgName}"></h6>
+            </td>
         </tr>
-        <tr>
+<!--        <tr>
             <td class="text-left">
                 <div th:if="${curtAssignee=='PR-PURCHASER'}">
                     <div class="mt-1">
@@ -103,7 +103,7 @@
                 </div>
 
             </td>
-        </tr>
+        </tr>-->
     </table>
 </div>
 <br>
@@ -124,6 +124,8 @@
                 <th scope="col" th:text="#{pr.details.unit.cost}"></th>
                 <th scope="col" th:text="#{pr.details.est.cost}"></th>
                 <th scope="col" th:text="#{pr.details.target.date}"></th>
+                <th scope="col" th:text="#{pr.details.memo}"></th>
+                <th scope="col" th:text="#{pr.prm.pocode}"></th>
             </tr>
             </thead>
             <tr th:each="prd,iter:${prds}">
@@ -154,6 +156,14 @@
                 </td>
                 <td>
                     <samll th:text="${#dates.format(prd.targetDate,'yyyy-MM-dd')}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.memo}"></samll>
+                </td>
+                <td th:if="${curtAssignee=='PR-PURCHASER'}">
+
+                    <span class="prd-id" th:text="${prd.id}" hidden></span>
+                    <input th:type="text" class="form-control po-code" th:value="${prd.poCode}">
                 </td>
             </tr>
         </table>
@@ -215,7 +225,9 @@
     </div>
     <ul th:each="prc,iter:${prcs}">
         <li>
+
             <samll th:text="${prc.userOrgName}"></samll>
+            <samll th:text="${prc.approved == 1 ? 'Agreed' : 'Rejected'}"></samll>
             <samll th:text="${prc.comment}"></samll>
         </li>
     </ul>
@@ -273,7 +285,9 @@
             let json_comment = {
                 "prMainId": prMainId,
                 "comment": comment,
-                "approved": agree
+                "approved": agree,
+                "gate":[[${taskName}]]
+
             };
             //Added comments
 
@@ -282,12 +296,13 @@
 
             if (curtAssignee === "PR-MANAGER") {
 
-                ajax_approvalByPerson(managerSsn, taskId, agree);
+                //ajax_approvalByPerson(managerSsn, taskId, agree);
+                ajax_approvalByPerson(userSsn, taskId, agree);
 
             } else {
 
                 if(curtAssignee === "PR-PURCHASER"){
-                    let success = updatePoCode(prMainId);
+                    let success = updatePoCode();
                     if(!success){
                         return false;
                     }
@@ -306,7 +321,18 @@
                 };
                 ajax_sentEmail(json_mail, prTitle,prMainId,"FINISHED", "msg");
             } else {
-                if (curtAssignee === "FINISHED") {
+                if (curtAssignee === "PR-MANAGER") {
+                    let countTask = ajax_countTaskByPrmId(prMainId);
+                    if (countTask === 0){
+                        json_mail = {
+                            "from": "euro-misi-it@euro-misi.cn",
+                            "to": nextAssignee,
+                            "content": "Dear role: " + nextAssignee +
+                                ", please proceed the process. "
+                        };
+                        ajax_sentEmail(json_mail, prTitle,prMainId,nextAssignee, "msg");
+                    }
+                }else if (curtAssignee === "FINISHED") {
                     json_mail = {
                         "from": "euro-misi-it@euro-misi.cn",
                         "to": userSsn,
@@ -337,7 +363,7 @@
         })
     })
 
-    function updatePoCode(prmId){
+/*    function updatePoCode(prmId){
         const poCode = $('#f_poCode').val();
         if ($.trim(poCode)===""){
             show_mes("msg","Po code cannot be empty.", true);
@@ -345,6 +371,25 @@
         }
         ajax_fillPoCodeByPrmId(prmId,poCode);
         return true;
+    }*/
+
+    function updatePoCode(){
+        let success = true;
+        $(".po-code").each(function (index, item){
+            //alert(($.trim($(item).val()) === ""));
+            if ($.trim($(item).val()) === ""){
+                show_mes("msg","Po code cannot be empty.", true);
+                success = false;
+                return false;
+            }else{
+                let prdId = $.trim($(item).parent("td").find(".prd-id").text());
+                //alert(prdId);
+                //alert($(item).val());
+                ajax_prdFillPoCodeByPrmId(prdId,$.trim($(item).val()));
+            }
+
+        });
+        return success;
     }
 
     function ajax_submitComment(json_comment) {
@@ -422,7 +467,7 @@
         })
     }
 
-    function ajax_fillPoCodeByPrmId(prmId,poCode){
+    /*function ajax_fillPoCodeByPrmId(prmId,poCode){
         $.ajax({
             type: "POST",
             contentType: "application/json",
@@ -442,8 +487,48 @@
                 show_mes("msg", [[#{page.submission.failed}]], true);
             }
         })
+    }*/
+    function ajax_prdFillPoCodeByPrmId(prdId,poCode){
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/api/pr/prd/pocode/" + prdId + "/" + poCode,
+            dataType: 'text',
+            cache: false,
+            async: false,
+            success: function (data) {
+                if(data.responseText!= "0"){
+                    show_mes("msg", [[#{page.submission.succeed}]], false);
+                }else{
+                    show_mes("msg", [[#{page.submission.failed}]], true);
+                }
+
+            },
+            error: function (data) {
+                show_mes("msg", [[#{page.submission.failed}]], true);
+            }
+        })
     }
 
+    function ajax_countTaskByPrmId(prmId){
+        let num = 0;
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/api/pr/process/task/count/" + prmId ,
+            dataType: 'text',
+            cache: false,
+            async: false,
+            success: function (data) {
+                num = data.responseText;
+            },
+            error: function (data) {
+                show_mes("msg", [[#{page.submission.failed}]], true);
+            }
+        })
+
+        return num;
+    }
 </script>
 </body>
 </html>

@@ -17,7 +17,7 @@
                     <span th:text="${iter.index +1 }"></span>
                 </td>
                 <td>
-                    <span th:text="${task.taskName}"></span>
+                    <span class="task-name" th:text="${task.taskName}"></span>
                 </td>
                 <td>
                     <input type="text" th:value="${task.taskId}" id="task_id" hidden>
@@ -61,10 +61,11 @@
         $(".read_prm").click(function (e){
             e.preventDefault();
             let prm_id = $(this).parent("td").find(".prmId").val();
+            let task_name = $(this).parent("td").find(".task-name").text();
            // let task_id = $("#task_id").val();
             let next_assignee = $(this).parent("td").find(".next_assignee").val();
            let current_assignee = $(this).parent("td").find(".current_Assignee").val()
-            ajax_readPrm(prm_id,current_assignee);
+            ajax_readPrm(prm_id,current_assignee,task_name);
         });
 
         $(".modal").on('hidden.bs.modal', function () {
@@ -72,11 +73,11 @@
         });
     })
 
-    function ajax_readPrm(prm_id,assignee) {
+    function ajax_readPrm(prm_id,assignee,task_name) {
         $.ajax({
             type: "GET",
             contentType: "text/html",
-            url: "/pr/prm/read/" + prm_id + "/" + assignee,
+            url: "/pr/prm/read/" + prm_id + "/" + assignee + "/" + task_name,
             dataType: 'html',
             cache: false,
             async: false,

@@ -33,6 +33,9 @@ public class ProcurementRequisitionComment {
     @Column(name = "approved")
     protected int approved;
 
+    @Column(name="gate")
+    protected String gate;
+
     public int getPrCommentId() {
         return prCommentId;
     }
@@ -89,6 +92,14 @@ public class ProcurementRequisitionComment {
         this.approved = approved;
     }
 
+    public String getGate() {
+        return gate;
+    }
+
+    public void setGate(String gate) {
+        this.gate = gate;
+    }
+
     @Override
     public String toString() {
         return "ProcurementRequisitionComment{" +
@@ -99,6 +110,7 @@ public class ProcurementRequisitionComment {
                 ", comment='" + comment + '\'' +
                 ", createdDate=" + createdDate +
                 ", approved=" + approved +
+                ", gate='" + gate + '\'' +
                 '}';
     }
 }

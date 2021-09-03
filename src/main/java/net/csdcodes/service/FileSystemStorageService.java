@@ -281,40 +281,52 @@ public class FileSystemStorageService implements StorageService {
         Iterator<Row> iterator = datatypeSheet.iterator();
         iterator.next(); //ignore the first row
 
-        while (iterator.hasNext()) {
+        try{
+            while (iterator.hasNext()) {
 
-            Row currentRow = iterator.next();
+                Row currentRow = iterator.next();
 
-            ProcurementRequisitionDetail prd = new ProcurementRequisitionDetail();
-            prd.setPrMainId(prmId);
+                ProcurementRequisitionDetail prd = new ProcurementRequisitionDetail();
+                prd.setPrMainId(prmId);
 
-            //System.out.println("ERP_code: " + currentRow.getCell(0));
-            prd.setItemErpCode(currentRow.getCell(0).getStringCellValue());
+                //System.out.println("ERP_code: " + currentRow.getCell(0));
+                prd.setItemErpCode(null == currentRow.getCell(0).getStringCellValue()  ? "" : currentRow.getCell(0).getStringCellValue().trim());
 
-            //System.out.println("ERP_desc: " + currentRow.getCell(1));
-            prd.setItemErpDesc(currentRow.getCell(1).getStringCellValue());
+                //System.out.println("ERP_desc: " + currentRow.getCell(1));
+                prd.setItemErpDesc(null == currentRow.getCell(1).getStringCellValue() ? "" : currentRow.getCell(1).getStringCellValue().trim());
 
-            //System.out.println("ERP_brand_size: " + currentRow.getCell(2).getStringCellValue());
-            prd.setItemErpBrandSize(currentRow.getCell(2).getStringCellValue());
+                //System.out.println("ERP_brand_size: " + (null == currentRow.getCell(2)) );
+                prd.setItemErpBrandSize(null == currentRow.getCell(2) ? "" : currentRow.getCell(2).getStringCellValue().trim());
 
-            //System.out.println("ERP_unit: " + currentRow.getCell(4));
-            prd.setItemErpUnit(currentRow.getCell(4).getStringCellValue());
+                //System.out.println("qty: " + currentRow.getCell(3));
+                prd.setQty(null == currentRow.getCell(3) ? 0:
+                        currentRow.getCell(3).getCellType() == CellType.NUMERIC ? Float.parseFloat(String.valueOf(currentRow.getCell(3))) : 0);
 
-            //System.out.println("qty: " + currentRow.getCell(3));
-            prd.setQty(currentRow.getCell(3).getCellType() == CellType.NUMERIC ? Float.parseFloat(String.valueOf(currentRow.getCell(3))) : 0);
+                //System.out.println("ERP_unit: " + currentRow.getCell(4));
+                prd.setItemErpUnit(null == currentRow.getCell(4) ? "" : currentRow.getCell(4).getStringCellValue().trim());
 
-            //System.out.println("est_cost: " + currentRow.getCell(5));
-            prd.setEstCost(currentRow.getCell(5).getCellType() == CellType.NUMERIC ? Float.parseFloat(String.valueOf(currentRow.getCell(5))) : 0);
 
-            //System.out.println("target_date: " + currentRow.getCell(6).getDateCellValue()
-            //+ simpleDateFormat.format(currentRow.getCell(6).getDateCellValue()));
-            String targetDate = simpleDateFormat.format(currentRow.getCell(6).getDateCellValue());
-            Date targetDate1 = new SimpleDateFormat("yyyy-MM-dd").parse(targetDate);
-            prd.setTargetDate(targetDate1);
+                //System.out.println("est_cost: " + currentRow.getCell(5));
+                prd.setEstCost(null == currentRow.getCell(5) ? 0: currentRow.getCell(5).getCellType() == CellType.NUMERIC ? Float.parseFloat(String.valueOf(currentRow.getCell(5))) : 0);
 
-            prs.createPRDetail(prmId, prd);
+                //System.out.println("target_date: " + currentRow.getCell(6).getDateCellValue());
 
+                if (null != currentRow.getCell(6)){
+                    //+ simpleDateFormat.format(currentRow.getCell(6).getDateCellValue()));
+                    String targetDate = simpleDateFormat.format(currentRow.getCell(6).getDateCellValue());
+                    Date targetDate1 = new SimpleDateFormat("yyyy-MM-dd").parse(targetDate);
+                    prd.setTargetDate(targetDate1);
+                }
+
+
+                //System.out.println(prd.toString());
+                prs.createPRDetail(prmId, prd);
+
+            }
+        }catch(Exception e){
+            System.out.println(e.getMessage());
         }
+
 
     }
 

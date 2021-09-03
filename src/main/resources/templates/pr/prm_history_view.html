@@ -73,10 +73,10 @@
                         <b><i class="fa fa-times fa-lg" style='color: red '></i></b>
                     </span>
             </td>
-            <td>
+<!--            <td>
                 <strong><label th:text="#{pr.prm.pocode} + ':'"></label></strong>
                 <h6 th:text="${prm.poCode}"/>
-            </td>
+            </td>-->
             <td>
                 <strong><label th:text="#{pr.apl.creation.date} + ':'"></label></strong>
                 <h6 th:text="${#dates.format(prm.prAplDate,'yyyy-MM-dd')}"/>
@@ -106,6 +106,8 @@
                 <th scope="col" th:text="#{pr.details.unit.cost}"></th>
                 <th scope="col" th:text="#{pr.details.est.cost}"></th>
                 <th scope="col" th:text="#{pr.details.target.date}"></th>
+                <th scope="col" th:text="#{pr.details.memo}"></th>
+                <th scope="col" th:text="#{pr.prm.pocode}"></th>
             </tr>
             </thead>
             <tr th:each="prd,iter:${prds}">
@@ -137,6 +139,12 @@
                 <td>
                     <samll th:text="${#dates.format(prd.targetDate,'yyyy-MM-dd')}"></samll>
                 </td>
+                <td>
+                    <samll th:text="${prd.memo}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.poCode}"></samll>
+                </td>
             </tr>
         </table>
     </div>
@@ -153,6 +161,7 @@
     <ul th:each="prc,iter:${prcs}">
         <li>
             <samll th:text="${prc.userOrgName}"></samll>
+            <samll th:text="${prc.approved==1 ? 'Agreed' : 'Rejected' }"></samll>
             <samll th:text="${prc.comment}"></samll>
         </li>
     </ul>

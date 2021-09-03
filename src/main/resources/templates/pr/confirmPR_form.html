@@ -1,15 +1,26 @@
 <div class="row justify-content-center" id="confirm_msg"></div>
 <div class="container">
     <div class="row d-flex justify-content-center align-items-center mx-5">
-        <h4>Select a department manager for approval</h4><i class='fa fa-asterisk'
-                                                            style='color: red;font-size: 0.5rem; '></i>
-        <select class="form-control" id="manager_list">
+
+            <h4>Select managers for approval</h4><i class='fa fa-asterisk'
+                                                                style='color: red;font-size: 0.5rem; '></i>
+    </div>
+
+<!--        <select class="form-control" id="manager_list">
             <option value="">Select a manager</option>
             <option th:each="user : ${roleList}"
                     th:value="${user.ssn}"
                     th:text="${user.orgName}">
             </option>
-        </select>
+        </select>-->
+
+        <div class="row d-flex justify-content-center align-items-center mx-5 form-check" th:each="user : ${roleList}" >
+            <input type="checkbox" class="form-check-input manager_list " th:value="${user.ssn}" th:id="${user.ssn}">
+            <label class="form-check-label offset-lg-1" th:text="${user.orgName}" th:for="${user.ssn}"/>
+        </div>
+
+
+    <div class="row d-flex justify-content-center align-items-center mx-5 mt-3">
         <button class="btn btn-danger my-2" th:text="#{pr.submit.flow}" id="submit_flow"></button>
     </div>
 
@@ -19,19 +30,27 @@
         $("#submit_flow").click(function (e){
             e.preventDefault();
             let result = verification();
-            if( result === true){
+            alert(result);
+            if( result !== true) {
+                return result;
+            }else{
                 let mainId = $.trim($("#f_prm_id").val());
                 let dept= $.trim($("#f_aplDept").val());
                 let prTitle = $.trim($("#f_prTitle").val());
-                let managerSsn = $.trim($("#manager_list").val());
+                //let managerSsn = $.trim($("#manager_list").val());
+                let assignees = [];
+                $(".manager_list:checked").each(function (){
+                   assignees.push($.trim($(this).val()));
+                });
 
                 let variables = {
                     "mainId":mainId,
                     "dept":dept,
                     "prTitle":prTitle,
-                    "managerSsn":managerSsn
-                }
+                    "managerSsn":assignees
 
+                }
+                alert(JSON.stringify(variables));
                 ajax_createPrRequest(variables);
 
                 json_mail = {
@@ -47,7 +66,7 @@
 
     function verification() {
         let result = true;
-        let input_len = $(".fa-asterisk").parents("div").find("select").length;
+        /*let input_len = $(".fa-asterisk").parents("div").find("select").length;
 
         for (let i=0; i< input_len; i++){
             if ($.trim($(".fa-asterisk").parents("div").find("select")[i].value) === ""){
@@ -55,6 +74,14 @@
                 show_mes("confirm_msg",[[#{page.input.required}]], true);
                 break;
             }
+        }*/
+
+        let input_len = $(".manager_list:checked").length;
+
+        if (input_len === 0){
+
+            show_mes("confirm_msg",[[#{page.input.required}]], true);
+            return false;
         }
 
         return result;
