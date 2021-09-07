@@ -17,14 +17,14 @@
                     <span th:text="${iter.index +1 }"></span>
                 </td>
                 <td>
-                    <span class="task-name" th:text="${task.taskName}"></span>
+                    <span th:text="${task.taskName}"></span>
                 </td>
                 <td>
-                    <input type="text" th:value="${task.taskId}" id="task_id" hidden>
+                    <input type="text" th:value="${task.taskId}" class="task_id" hidden>
                     <input type="text" th:value="${task.taskData.nextAssignee}" class="next_assignee" hidden>
                     <input type="text" th:value="${task.taskData.curtAssignee}" class="current_Assignee" hidden>
                     <input type="text" class="prmId" th:value="${task.taskData.mainId}" hidden>
-
+                    <input type="text" class="task-name" th:value="${task.taskName}" hidden>
                     <a class="read_prm" href="" ><i class="fa fa-info-circle fa-lg mr-2" style="color: green"></i>[[${task.taskData.prTitle}]]
                     </a>
                 </td>
@@ -61,11 +61,12 @@
         $(".read_prm").click(function (e){
             e.preventDefault();
             let prm_id = $(this).parent("td").find(".prmId").val();
-            let task_name = $(this).parent("td").find(".task-name").text();
-           // let task_id = $("#task_id").val();
+            let task_name = $(this).parent("td").find(".task-name").val();
+
+            let task_id =  $(this).parent("td").find(".task_id").val();
             let next_assignee = $(this).parent("td").find(".next_assignee").val();
            let current_assignee = $(this).parent("td").find(".current_Assignee").val()
-            ajax_readPrm(prm_id,current_assignee,task_name);
+            ajax_readPrm(task_id,prm_id,current_assignee);
         });
 
         $(".modal").on('hidden.bs.modal', function () {
@@ -73,11 +74,13 @@
         });
     })
 
-    function ajax_readPrm(prm_id,assignee,task_name) {
+    function ajax_readPrm(task_id,prm_id,assignee) {
+        //alert("/pr/prm/read/" +task_id + "/" + prm_id + "/" + assignee );
+
         $.ajax({
             type: "GET",
             contentType: "text/html",
-            url: "/pr/prm/read/" + prm_id + "/" + assignee + "/" + task_name,
+            url: "/pr/prm/read/" +task_id + "/" + prm_id + "/" + assignee ,
             dataType: 'html',
             cache: false,
             async: false,

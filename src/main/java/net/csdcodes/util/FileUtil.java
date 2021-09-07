@@ -36,7 +36,7 @@ public class FileUtil {
 
                     Files.copy(inputStream, destinationFile,
                             StandardCopyOption.REPLACE_EXISTING);
-                    System.out.println(destinationFile.toString());
+                    //System.out.println(destinationFile.toString());
 
                 } catch (IOException ioe) {
                     throw new StorageException("Failed to store file " + file.getOriginalFilename(), ioe);

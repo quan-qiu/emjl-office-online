@@ -112,8 +112,8 @@ public class ProcurementRequisitionService {
 
     public int updatePRMainById(int id, ProcurementRequisitionMain prm) {
         LocalDateTime now = LocalDateTime.now();
-        System.out.println(prm);
-        System.out.println("PR" + String.format("%010d", prm.getId()));
+        //System.out.println(prm);
+        //System.out.println("PR" + String.format("%010d", prm.getId()));
 
         int result = jdbcTemplate.update("UPDATE [dbo].[pr_main] set pr_title=?,cost_center=?, " +
                         "apl_dept=?, pr_no=?, project_name=?,pr_apl_update_date=? " +
@@ -152,7 +152,7 @@ public class ProcurementRequisitionService {
     }
 
     public int createPRDetail(int prmId, ProcurementRequisitionDetail prd) {
-        System.out.println(prd.toString());
+        //System.out.println(prd.toString());
 
         LocalDateTime now = LocalDateTime.now();
         String pattern = "yyyy-MM-dd";
@@ -270,8 +270,8 @@ public class ProcurementRequisitionService {
                 "from [pr_comment] p " +
                 "where p.[pr_main_id]=? order by pr_comment_id asc";
 
-        System.out.println(sql);
-        System.out.println(prMainId);
+        //System.out.println(sql);
+        //System.out.println(prMainId);
 
         List prComments = jdbcTemplate.query(sql, new Object[]{prMainId}, BeanPropertyRowMapper.newInstance(ProcurementRequisitionComment.class));
         return prComments;
@@ -330,7 +330,7 @@ public class ProcurementRequisitionService {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         LocalDateTime now = LocalDateTime.now();
 
-        System.out.println(prc.toString());
+       // System.out.println(prc.toString());
 
         jdbcTemplate.update(
                 new PreparedStatementCreator() {

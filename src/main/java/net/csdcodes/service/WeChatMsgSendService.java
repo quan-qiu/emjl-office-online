@@ -72,7 +72,7 @@ public class WeChatMsgSendService {
 
             HttpEntity entity = response.getEntity();
             resp = EntityUtils.toString(entity, "utf-8");
-            System.out.println(resp);
+            //System.out.println(resp);
             EntityUtils.consume(entity);
         } catch (ClientProtocolException e) {
             //Log.e(getClass().getSimpleName(), "HTTP protocol error", e);

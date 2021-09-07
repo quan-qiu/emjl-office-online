@@ -166,9 +166,9 @@ public class PrProcessApiController {
         return new ResponseEntity<>("Couldn't find",HttpStatus.OK);
     }
 
-    @GetMapping("/task/count/{prmId}")
-    public ResponseEntity<?> countTaskByPrmId(@PathVariable int prmId){
-        int num = prProcessService.countTaskByPrmId(prmId);
+    @GetMapping("/task/count/{prmId}/{taskName}")
+    public ResponseEntity<?> countTaskByPrmId(@PathVariable int prmId, @PathVariable String taskName){
+        int num = prProcessService.countTaskByPrmId(prmId,taskName);
 
         return new ResponseEntity<>(num, HttpStatus.OK);
     }

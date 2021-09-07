@@ -10,6 +10,7 @@ import net.csdcodes.service.ProcurementRequisitionService;
 import net.csdcodes.service.StorageService;
 import net.csdcodes.service.UserService;
 import net.csdcodes.util.PrmExcelExporter;
+import org.flowable.engine.TaskService;
 import org.flowable.task.api.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,9 @@ public class ProcurementRequisitionController {
     StorageService storageService;
     @Autowired
     PrProcessService prProcessService;
+
+    @Autowired
+    TaskService taskService;
 
 
     @GetMapping("")
@@ -113,44 +117,53 @@ public class ProcurementRequisitionController {
         return "pr/prm_edit";
     }
 
-    @GetMapping("/prm/read/{prmId}/{assignee}/{taskName}")
-    public String readPRMById(@PathVariable int prmId,@PathVariable String assignee,@PathVariable String taskName,
+    @GetMapping("/prm/read/{taskId}/{prmId}/{assignee}")
+    public String readPRMById(@PathVariable String taskId, @PathVariable int prmId,@PathVariable String assignee,
                               Model model){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User thisUser = userService.getUserByUsername(auth.getName());
-        Task task = null;
-        if (assignee.equals("PR-MANAGER")){
-            task = prProcessService.getTaskByPrmIdAndAssignee(prmId,thisUser.getSsn().trim());
-        }else{
-            task = prProcessService.getTaskByPrmId(prmId);
-        }
+
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 
         if (null != task){
-
-            String taskId = task.getId();
 
             Map<String, Object> variables= prProcessService.getTaskInstanceVariable(taskId);
 
             if (assignee.equals("PR-MANAGER")){
 
                 String assigneeInFlow = task.getAssignee();
+                //System.out.println("assigneeInFlow : " + assigneeInFlow);
                 if(!assigneeInFlow.equals(thisUser.getSsn().trim())){
+
                     return "redirect:/pr/prm/history/" + prmId ;
+                }else{
+                    TaskDetails taskDetails = prProcessService.getTaskDetailsByTaskId(taskId);
+
+                    model.addAttribute("taskId", taskId);
+                    model.addAttribute("curtAssignee", variables.get("curtAssignee").toString());
+                    model.addAttribute("nextAssignee", variables.get("nextAssignee").toString());
+                    model.addAttribute("managerSsn", variables.get("managerSsn"));
+                    model.addAttribute("orgName", variables.get("orgName").toString().trim());
+                    model.addAttribute("taskName", task.getName());
                 }
             }else {
+
                 if(!assignee.equals(variables.get("curtAssignee"))){
+                    //System.out.println(assignee);
+                    //System.out.println(variables.get("curtAssignee"));
+
                     return "redirect:/pr/prm/history/" + prmId ;
+                }else{
+                    TaskDetails taskDetails = prProcessService.getTaskDetailsByTaskId(taskId);
+
+                    model.addAttribute("taskId", taskId);
+                    model.addAttribute("curtAssignee", variables.get("curtAssignee").toString());
+                    model.addAttribute("nextAssignee", variables.get("nextAssignee").toString());
+                    model.addAttribute("managerSsn", variables.get("managerSsn"));
+                    model.addAttribute("orgName", variables.get("orgName").toString().trim());
+                    model.addAttribute("taskName", task.getName());
                 }
-
             }
-
-            model.addAttribute("taskId", taskId);
-            model.addAttribute("curtAssignee", variables.get("curtAssignee"));
-            model.addAttribute("nextAssignee", variables.get("nextAssignee"));
-            model.addAttribute("managerSsn", variables.get("managerSsn"));
-            model.addAttribute("orgName", variables.get("orgName"));
-            model.addAttribute("taskName", taskName);
-
         }else{
 
             model.addAttribute("taskId", "");
@@ -158,6 +171,7 @@ public class ProcurementRequisitionController {
             model.addAttribute("nextAssignee", "");
             model.addAttribute("managerSsn", "");
             model.addAttribute("orgName", "");
+            model.addAttribute("taskName", "");
         }
         ProcurementRequisitionMain prm = prs.getPRMainById(prmId);
         List prds = prs.getPRDetailsByPRMId(prmId);
@@ -167,7 +181,7 @@ public class ProcurementRequisitionController {
         model.addAttribute("prm", prm);
         model.addAttribute("prcs", prComments);
         model.addAttribute("userSsn", prm.getAplUserSsn());
-        model.addAttribute("taskName", taskName);
+
         return "pr/prm_readonly";
     }
 
@@ -278,17 +292,27 @@ public class ProcurementRequisitionController {
         Iterator<Role> itr = roles.iterator();
         Set<TaskDetails> tasks = new HashSet<>();
         while (itr.hasNext()){
-            List<TaskDetails> taskDetails = prProcessService.getTasksByGroup(itr.next().getName());
-            Iterator<TaskDetails> itt = taskDetails.iterator();
-            while (itt.hasNext()){
-                tasks.add(itt.next());
+            String role = itr.next().getName();
+            //System.out.println("role: = " + role.toString());
+            List<TaskDetails> taskDetails = null;
+
+           taskDetails = prProcessService.getTasksByGroup(role);
+
+            if(taskDetails != null){
+                Iterator<TaskDetails> itt = taskDetails.iterator();
+                while (itt.hasNext()){
+                    tasks.add(itt.next());
+                }
             }
+
         }
 
         List<TaskDetails> personalTasks = prProcessService.getTasksByAssignee(thisUser.getSsn());
         tasks.addAll(personalTasks);
 
         model.addAttribute("myTasks",tasks);
+
+        //System.out.println(Arrays.toString(tasks.toArray()));
 
         return "pr/myTasks";
     }

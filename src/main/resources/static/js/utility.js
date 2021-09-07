@@ -1,8 +1,24 @@
-function ajax_sentEmail(json_mail,prTitle,prmId,curtAssignee,div_msg){
+function ajax_sentEmail(json_mail,prTitle,taskId,prmId,curtAssignee,div_msg){
     $.ajax({
         type: "POST",
         contentType: "application/json",
-        url: "/api/email/send/htmlmail/"+ prTitle + "/" +prmId + "/" +curtAssignee,
+        url: "/api/email/send/htmlmail/"+ prTitle + "/" +taskId+ "/" +prmId + "/" +curtAssignee,
+        data: JSON.stringify(json_mail),
+        dataType: 'json',
+        cache: false,
+        async: true,
+        complete: function () {
+            show_mes(div_msg,"Sent out email",false);
+
+        }
+    })
+}
+
+function ajax_sentEmailWithoutTaskId(json_mail,prTitle,prmId,curtAssignee,div_msg){
+    $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: "/api/email/send/htmlmail/withoutTaskId/"+ prTitle + "/" +prmId + "/" +curtAssignee,
         data: JSON.stringify(json_mail),
         dataType: 'json',
         cache: false,

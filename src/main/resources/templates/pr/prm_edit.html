@@ -178,6 +178,7 @@
                 <th scope="col" th:text="#{pr.details.qty}"></th>
                 <th scope="col" th:text="#{pr.details.unit.cost}"></th>
                 <th scope="col" th:text="#{pr.details.est.cost}"></th>
+                <th scope="col" th:text="#{pr.details.memo}"></th>
                 <th scope="col" th:text="#{pr.details.target.date}"></th>
             </tr>
             </thead>
@@ -215,6 +216,9 @@
                 </td>
                 <td>
                     <samll th:text="${prd.totalEstCost}"></samll>
+                </td>
+                <td>
+                    <samll th:text="${prd.memo}"></samll>
                 </td>
                 <td>
                     <samll th:text="${#dates.format(prd.targetDate,'yyyy-MM-dd')}"></samll>

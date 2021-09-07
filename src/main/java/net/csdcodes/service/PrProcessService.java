@@ -90,7 +90,7 @@ public class PrProcessService {
         //variables.put("managerSsn",variablesObj.get("managerSsn").getAsString());
         variables.put("managerSsn",assignees);
 
-            System.out.println("ProcessInstanceResponse variables : " + variables.toString());
+        //    System.out.println("ProcessInstanceResponse variables : " + variables.toString());
 
         ProcessInstance processInstance =
                 runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, variables);
@@ -101,20 +101,53 @@ public class PrProcessService {
 
     }
 
+
+
     public List<TaskDetails> getTasksByGroup(String groupName) {
+        System.out.println("---------------groupname: " + groupName);
         List<Task> tasks =
                 taskService.createTaskQuery().taskCandidateGroup(groupName).list();
         List<TaskDetails> taskDetails = getTaskDetails(tasks);
+        System.out.println(Arrays.toString(taskDetails.toArray()));
+        return taskDetails;
+    }
 
+    public List<TaskDetails> getTasksByAssignee(String assignee){
+        System.out.println("++++++ assignee: " + assignee);
+        List<Task> tasks = taskService.createTaskQuery().taskAssignee(assignee).list();
+        List<TaskDetails> taskDetails = getTaskDetails(tasks);
+        System.out.println(Arrays.toString(taskDetails.toArray()));
+        return taskDetails;
+    }
+
+    public TaskDetails getTaskDetailsByTaskId(String taskId){
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        TaskDetails taskDetails = getSingleTaskDetail(task);
+        System.out.println(taskDetails.toString());
         return taskDetails;
     }
 
     public Task getTaskByPrmId(int prmId){
         System.out.println("Task getTaskByPrmId : " + prmId ) ;
-        Task task = taskService.createTaskQuery().processVariableValueEquals("mainId", String.valueOf(prmId)).singleResult();
+        Task task = taskService.createTaskQuery()
+                .processVariableValueEquals("mainId", String.valueOf(prmId))
+                .singleResult();
 
         if (task != null){
             return task;
+        }else{
+            return null;
+        }
+
+    }
+
+    public List<Task> getTasksByPrmId(int prmId){
+        System.out.println("Tasks getTaskByPrmId : " + prmId ) ;
+        List<Task> tasks = taskService.createTaskQuery()
+                .processVariableValueEquals("mainId", String.valueOf(prmId)).list();
+
+        if (tasks != null){
+            return tasks;
         }else{
             return null;
         }
@@ -136,12 +169,13 @@ public class PrProcessService {
 
     }
 
-    public int countTaskByPrmId(int prmId){
+    public int countTaskByPrmId(int prmId,String taskName){
         System.out.println("Task getTaskByPrmId : " + prmId ) ;
-
+        System.out.println("taskName : " + taskName ) ;
         return (int) taskService
                 .createTaskQuery()
                 .processVariableValueEquals("mainId", String.valueOf(prmId))
+                .taskName(taskName)
                 .count();
 
     }
@@ -170,13 +204,7 @@ public class PrProcessService {
         return taskDetails;
     }*/
 
-    public List<TaskDetails> getTasksByAssignee(String assignee){
 
-        List<Task> tasks = taskService.createTaskQuery().taskAssignee(assignee).list();
-        List<TaskDetails> taskDetails = getTaskDetails(tasks);
-
-        return taskDetails;
-    }
 
     public List<TaskDetails> getUserTasks(){
         List<Task> tasks = taskService.createTaskQuery().taskUnassigned().list();
@@ -191,20 +219,29 @@ public class PrProcessService {
         //System.out.println("===========start==============");
         //System.out.println("taskid: " + taskId);
         //System.out.println("role: " + role);
+
+        Map<String, Object> approveVar = new HashMap<String, Object>();
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+
+
         String processId= task.getProcessInstanceId();
         Map<String, Object> variables = runtimeService.getVariables(processId);
 
-        Map<String, Object> approveVar = new HashMap<String, Object>();
 
         if(role.equals(TASK_AUDITOR_GROUP)) {
             //System.out.println("----------- update assignee : TASK_AUDITOR_GROUP");
             runtimeService.setVariable(processId, "curtAssignee",TASK_MANAGER_GROUP);
             runtimeService.setVariable(processId, "nextAssignee",TASK_DEPUTY_MANAGER_GROUP);
         }
-        if(!role.startsWith("PR-")){
-            runtimeService.setVariable(processId, "curtAssignee",TASK_DEPUTY_MANAGER_GROUP);
-            runtimeService.setVariable(processId, "nextAssignee",TASK_MANAGER_DIRECTOR_GROUP);
+        if(role.equals(TASK_MANAGER_GROUP)){
+            String mainId = (String)variables.get("mainId");
+            int numOfTask = countTaskByPrmId(Integer.parseInt(mainId),task.getName());
+            System.out.println("approvePr numOfTask : " + numOfTask);
+            if(1 == numOfTask){
+                runtimeService.setVariable(processId, "curtAssignee",TASK_DEPUTY_MANAGER_GROUP);
+                runtimeService.setVariable(processId, "nextAssignee",TASK_MANAGER_DIRECTOR_GROUP);
+            }
+
         }
         if(role.equals(TASK_DEPUTY_MANAGER_GROUP)){
             runtimeService.setVariable(processId, "curtAssignee",TASK_MANAGER_DIRECTOR_GROUP);
@@ -225,13 +262,13 @@ public class PrProcessService {
 
         if (approved == 1){
             approveVar.put("approved", true);
+            taskService.complete(taskId, approveVar);
         }else{
-            approveVar.put("approved", false);
+
+            runtimeService.deleteProcessInstance(processId,"reject");
+
         }
 
-        //System.out.println("approveVar: " + approveVar);
-        //System.out.println("===========end==============");
-        taskService.complete(taskId, approveVar);
 
     }
 
@@ -242,6 +279,12 @@ public class PrProcessService {
             taskDetails.add(new TaskDetails(task.getId(),task.getName(),processVariables, task.getTaskDefinitionId()));
         }
         return taskDetails;
+    }
+
+    private TaskDetails getSingleTaskDetail(Task task){
+        Map<String , Object> processVariables = taskService.getVariables(task.getId());
+
+        return new TaskDetails(task.getId(),task.getName(),processVariables, task.getTaskDefinitionId());
     }
 
     public void checkProcessHistory(String processId) {
@@ -278,20 +321,26 @@ public class PrProcessService {
 
     public boolean revokeProcessInstance(int prmId){
         try {
-            Task task = getTaskByPrmId(prmId);
+            List<Task> tasks = getTasksByPrmId(prmId);
 
-            if (Objects.isNull(task)) {
+            if (Objects.isNull(tasks)) {
                 System.out.println("task is null");
                 return false;
             }
-            System.out.println(task.toString());
-            String processInstanceId = task.getProcessInstanceId();
-            System.out.println("processInstanceId: " + processInstanceId);
-            if (processInstanceId == null) {
-                System.out.println("processInstanceId is null");
-                return false;
+            Iterator<Task> iterTasks = tasks.iterator();
+
+            while(iterTasks.hasNext()){
+                Task task = iterTasks.next();
+                System.out.println(task.toString());
+                String processInstanceId = task.getProcessInstanceId();
+                System.out.println("processInstanceId: " + processInstanceId);
+                if (processInstanceId == null) {
+                    System.out.println("processInstanceId is null");
+                    return false;
+                }
+                runtimeService.deleteProcessInstance(processInstanceId, "User revoke");
             }
-            runtimeService.deleteProcessInstance(processInstanceId, "User revoke");
+
 
             return true;
 

@@ -160,6 +160,7 @@
     </div>
     <ul th:each="prc,iter:${prcs}">
         <li>
+            <samll th:text="${prc.gate}"></samll>
             <samll th:text="${prc.userOrgName}"></samll>
             <samll th:text="${prc.approved==1 ? 'Agreed' : 'Rejected' }"></samll>
             <samll th:text="${prc.comment}"></samll>

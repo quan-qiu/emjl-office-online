@@ -177,7 +177,7 @@
     <div class="row">
         <div class="card text-right">
             <div class="card-header bg-primary">
-                <h5 th:text="#{pr.approve.comment}"></h5>
+                <h5 th:text="${taskName}"></h5>
             </div>
             <div class="col-lg text-right">
                 <form>
@@ -225,7 +225,7 @@
     </div>
     <ul th:each="prc,iter:${prcs}">
         <li>
-
+            <samll th:text="${prc.gate}"></samll>
             <samll th:text="${prc.userOrgName}"></samll>
             <samll th:text="${prc.approved == 1 ? 'Agreed' : 'Rejected'}"></samll>
             <samll th:text="${prc.comment}"></samll>
@@ -297,7 +297,7 @@
             if (curtAssignee === "PR-MANAGER") {
 
                 //ajax_approvalByPerson(managerSsn, taskId, agree);
-                ajax_approvalByPerson(userSsn, taskId, agree);
+                ajax_approvalByPerson(curtAssignee, taskId, agree);
 
             } else {
 
@@ -319,18 +319,19 @@
                     "to": userSsn,
                     "content": "PR process:" + prTitle + " was rejected"
                 };
-                ajax_sentEmail(json_mail, prTitle,prMainId,"FINISHED", "msg");
+                ajax_sentEmail(json_mail, prTitle,taskId,prMainId,"FINISHED", "msg");
             } else {
                 if (curtAssignee === "PR-MANAGER") {
-                    let countTask = ajax_countTaskByPrmId(prMainId);
-                    if (countTask === 0){
+                    let countTask = ajax_countTaskByPrmId(prMainId,[[${taskName}]]);
+
+                    if (countTask === "0"){
                         json_mail = {
                             "from": "euro-misi-it@euro-misi.cn",
                             "to": nextAssignee,
                             "content": "Dear role: " + nextAssignee +
                                 ", please proceed the process. "
                         };
-                        ajax_sentEmail(json_mail, prTitle,prMainId,nextAssignee, "msg");
+                        ajax_sentEmailWithoutTaskId(json_mail, prTitle,prMainId,nextAssignee, "msg");
                     }
                 }else if (curtAssignee === "FINISHED") {
                     json_mail = {
@@ -338,7 +339,7 @@
                         "to": userSsn,
                         "content": "PR process:" + prTitle + " was aggreed"
                     };
-                    ajax_sentEmail(json_mail, prTitle,prMainId,"FINISHED", "msg");
+                    ajax_sentEmail(json_mail, prTitle,taskId,prMainId,"FINISHED", "msg");
                 }else{
                     if (nextAssignee === "FINISHED") {
                         json_mail = {
@@ -346,7 +347,7 @@
                             "to": userSsn,
                             "content": "The PR process was approved."
                         };
-                        ajax_sentEmail(json_mail, prTitle,prMainId,"FINISHED", "msg");
+                        ajax_sentEmail(json_mail, prTitle,taskId,prMainId,"FINISHED", "msg");
                     } else {
                         json_mail = {
                             "from": "euro-misi-it@euro-misi.cn",
@@ -354,7 +355,7 @@
                             "content": "Dear role: " + nextAssignee +
                                 ", please proceed the process. "
                         };
-                        ajax_sentEmail(json_mail, prTitle,prMainId,nextAssignee, "msg");
+                        ajax_sentEmailWithoutTaskId(json_mail, prTitle,prMainId,nextAssignee, "msg");
                     }
                 }
 
@@ -363,15 +364,6 @@
         })
     })
 
-/*    function updatePoCode(prmId){
-        const poCode = $('#f_poCode').val();
-        if ($.trim(poCode)===""){
-            show_mes("msg","Po code cannot be empty.", true);
-            return false;
-        }
-        ajax_fillPoCodeByPrmId(prmId,poCode);
-        return true;
-    }*/
 
     function updatePoCode(){
         let success = true;
@@ -510,21 +502,24 @@
         })
     }
 
-    function ajax_countTaskByPrmId(prmId){
+    function ajax_countTaskByPrmId(prmId,taskName){
+
         let num = 0;
         $.ajax({
             type: "GET",
             contentType: "application/json",
-            url: "/api/pr/process/task/count/" + prmId ,
+            url: "/api/pr/process/task/count/" + prmId + "/" + taskName ,
             dataType: 'text',
             cache: false,
             async: false,
             success: function (data) {
-                num = data.responseText;
+
+                num = data;
             },
             error: function (data) {
                 show_mes("msg", [[#{page.submission.failed}]], true);
             }
+
         })
 
         return num;

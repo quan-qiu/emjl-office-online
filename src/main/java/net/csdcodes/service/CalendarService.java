@@ -69,7 +69,7 @@ public class CalendarService {
         int result = jdbcTemplate.update("DELETE from calendar where id=?",
                 new Object[]{id}
         );
-        System.out.println(result);
+        //System.out.println(result);
         return result;
     }
 }

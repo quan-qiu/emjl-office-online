@@ -30,7 +30,7 @@
         $("#submit_flow").click(function (e){
             e.preventDefault();
             let result = verification();
-            alert(result);
+            //alert(result);
             if( result !== true) {
                 return result;
             }else{
@@ -50,7 +50,7 @@
                     "managerSsn":assignees
 
                 }
-                alert(JSON.stringify(variables));
+                //alert(JSON.stringify(variables));
                 ajax_createPrRequest(variables);
 
                 json_mail = {
@@ -59,7 +59,7 @@
                     "content": "Dear role: " + "PR-AUDITOR" +
                         ", please proceed the process. "
                 };
-                ajax_sentEmail(json_mail,prTitle,mainId,"PR-AUDITOR","confirm_msg");
+                ajax_sentEmailWithoutTaskId(json_mail,prTitle,mainId,"PR-AUDITOR","confirm_msg");
             }
         })
     });

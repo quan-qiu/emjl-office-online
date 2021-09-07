@@ -191,7 +191,7 @@ public class ProcurementRequisitionApiController {
         int resultDelete = prs.deleteProcurementRequisitionCommentByPrmId(prmId);
 
 
-        System.out.println("resultDelete : " + resultDelete);
+        //System.out.println("resultDelete : " + resultDelete);
         return ResponseEntity.noContent().build();
     }
 
@@ -218,7 +218,7 @@ public class ProcurementRequisitionApiController {
     public ResponseEntity<ErrorMsg> copyCreatePrByPrmId(@PathVariable int prmId){
         try{
             int newId = prs.copyCreatePrmByPrmId(prmId);
-            System.out.println(newId);
+            //System.out.println(newId);
             int updatePrCode = prs.updatePrnoByPrmId(newId);
 
             int result = prs.copyCreatePrdByPrmId(prmId, newId);
