@@ -11,7 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+/**
+ * creator: Quan Qiu
+ * date: 06/03/21
+ */
 @Controller
 @RequestMapping("/hr")
 public class HrController {

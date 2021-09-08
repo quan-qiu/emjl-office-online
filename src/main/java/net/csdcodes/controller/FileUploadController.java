@@ -20,7 +20,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
-
+/**
+ * creator: Quan Qiu
+ * date: 06/03/21
+ */
 @Controller
 @RequestMapping("/file")
 public class FileUploadController {

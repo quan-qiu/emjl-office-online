@@ -7,6 +7,7 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col" th:text="#{pr.task.assignee}"></th>
+                <th scope="col" th:text="#{pr.task.manager}"></th>
                 <th scope="col" th:text="#{pr.title}">PR title</th>
                 <th scope="col" th:text="#{admin.user.username}"></th>
                 <th scope="col" th:text="#{pr.apl.dept}"></th>
@@ -18,6 +19,10 @@
                 </td>
                 <td>
                     <span th:text="${task.taskName}"></span>
+                </td>
+                <td>
+                    <input type="button" class="btn btn-info btn-display-manager" th:value="#{pr.task.manager}">
+                    <input type="text" class="manager-ssn" th:value="${task.taskData.managerSsn}" hidden>
                 </td>
                 <td>
                     <input type="text" th:value="${task.taskId}" class="task_id" hidden>
@@ -55,6 +60,22 @@
     </div>
 </div>
 
+<div class="modal fade" id="get_manager_name_modal">
+    <div class="modal-dialog" >
+        <div class="modal-content">
+            <div class="modal-header d-block">
+                <h4 class="modal-title " th:text="#{pr.task.manager}"></h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body" id="manager_name_details">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" th:text="#{page.close}"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script th:inline="javascript">
 
     $(document).ready(function () {
@@ -72,7 +93,27 @@
         $(".modal").on('hidden.bs.modal', function () {
             $("#my_tasks").trigger("click");
         });
+
+        $(".btn-display-manager").click(function (){
+            let managerSsn = $(this).parent("td").find(".manager-ssn").val().split('[')[1].split("]")[0];
+            const ssnList = managerSsn.split(", ");
+            let managerNames="";
+            for(let i=0; i<ssnList.length; i++){
+
+                let name = ajax_getManagerNameBySsn(ssnList[i]);
+                managerNames = managerNames + name;
+            }
+            if(managerNames !== ""){
+                displayManagerName(managerNames);
+            }
+        })
     })
+
+    function displayManagerName(managerName){
+        $("#manager_name_details").empty();
+        $("#manager_name_details").html(managerName);
+        $("#get_manager_name_modal").modal();
+    }
 
     function ajax_readPrm(task_id,prm_id,assignee) {
         //alert("/pr/prm/read/" +task_id + "/" + prm_id + "/" + assignee );
@@ -90,5 +131,21 @@
                 $("#read_prm_modal").modal();
             }
         })
+    }
+
+    function ajax_getManagerNameBySsn(managerSsn){
+        let name = "";
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/api/user/managers/" +managerSsn ,
+            dataType: 'text',
+            cache: false,
+            async: false,
+            success: function (data) {
+                name =  data;
+            }
+        })
+        return name;
     }
 </script>

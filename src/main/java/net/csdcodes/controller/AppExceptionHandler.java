@@ -7,7 +7,10 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+/**
+ * creator: Quan Qiu
+ * date: 06/03/21
+ */
 @ControllerAdvice
 public class AppExceptionHandler {
 

@@ -8,7 +8,10 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.util.Arrays;
-
+/**
+ * creator: Quan Qiu
+ * date: 06/03/21
+ */
 @ControllerAdvice
 public class BuildPropertiesController {
 

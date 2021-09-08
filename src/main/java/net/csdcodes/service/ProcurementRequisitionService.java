@@ -498,7 +498,7 @@ public class ProcurementRequisitionService {
 
         ProcurementRequisitionMain procurementRequisitionMain = getPRMainById(prmId);
 
-        System.out.println(procurementRequisitionMain);
+        //System.out.println(procurementRequisitionMain);
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         LocalDateTime now = LocalDateTime.now();
