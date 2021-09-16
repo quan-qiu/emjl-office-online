@@ -187,7 +187,7 @@ public class AdministrationApiController {
 
     @PostMapping(value="/ipAddress", produces = {MimeTypeUtils.APPLICATION_JSON_VALUE})
     public String addIpAddress(@RequestBody IpAddress ipAddress) {
-        System.out.println(ipAddress.toString());
+        //System.out.println(ipAddress.toString());
         try {
             boolean result = administrationService.addIpAddress(ipAddress);
 

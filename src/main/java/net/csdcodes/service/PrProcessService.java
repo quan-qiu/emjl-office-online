@@ -104,31 +104,31 @@ public class PrProcessService {
 
 
     public List<TaskDetails> getTasksByGroup(String groupName) {
-        System.out.println("---------------groupname: " + groupName);
+        //System.out.println("---------------groupname: " + groupName);
         List<Task> tasks =
                 taskService.createTaskQuery().taskCandidateGroup(groupName).list();
         List<TaskDetails> taskDetails = getTaskDetails(tasks);
-        System.out.println(Arrays.toString(taskDetails.toArray()));
+        //System.out.println(Arrays.toString(taskDetails.toArray()));
         return taskDetails;
     }
 
     public List<TaskDetails> getTasksByAssignee(String assignee){
-        System.out.println("++++++ assignee: " + assignee);
+        //System.out.println("++++++ assignee: " + assignee);
         List<Task> tasks = taskService.createTaskQuery().taskAssignee(assignee).list();
         List<TaskDetails> taskDetails = getTaskDetails(tasks);
-        System.out.println(Arrays.toString(taskDetails.toArray()));
+        //System.out.println(Arrays.toString(taskDetails.toArray()));
         return taskDetails;
     }
 
     public TaskDetails getTaskDetailsByTaskId(String taskId){
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         TaskDetails taskDetails = getSingleTaskDetail(task);
-        System.out.println(taskDetails.toString());
+        //System.out.println(taskDetails.toString());
         return taskDetails;
     }
 
     public Task getTaskByPrmId(int prmId){
-        System.out.println("Task getTaskByPrmId : " + prmId ) ;
+        //System.out.println("Task getTaskByPrmId : " + prmId ) ;
         Task task = taskService.createTaskQuery()
                 .processVariableValueEquals("mainId", String.valueOf(prmId))
                 .singleResult();
@@ -142,7 +142,7 @@ public class PrProcessService {
     }
 
     public List<Task> getTasksByPrmId(int prmId){
-        System.out.println("Tasks getTaskByPrmId : " + prmId ) ;
+        //System.out.println("Tasks getTaskByPrmId : " + prmId ) ;
         List<Task> tasks = taskService.createTaskQuery()
                 .processVariableValueEquals("mainId", String.valueOf(prmId)).list();
 
@@ -155,7 +155,7 @@ public class PrProcessService {
     }
 
     public Task getTaskByPrmIdAndAssignee(int prmId,String assignee){
-        System.out.println("Task getTaskByPrmId : " + prmId ) ;
+        //System.out.println("Task getTaskByPrmId : " + prmId ) ;
         Task task = taskService.createTaskQuery()
                 .processVariableValueEquals("mainId", String.valueOf(prmId))
                 .taskAssignee(assignee)
@@ -170,8 +170,8 @@ public class PrProcessService {
     }
 
     public int countTaskByPrmId(int prmId,String taskName){
-        System.out.println("Task getTaskByPrmId : " + prmId ) ;
-        System.out.println("taskName : " + taskName ) ;
+        //System.out.println("Task getTaskByPrmId : " + prmId ) ;
+        //System.out.println("taskName : " + taskName ) ;
         return (int) taskService
                 .createTaskQuery()
                 .processVariableValueEquals("mainId", String.valueOf(prmId))
